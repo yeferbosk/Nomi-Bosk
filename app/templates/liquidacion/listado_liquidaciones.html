@@ -1,0 +1,45 @@
+<h2>Liquidaciones Generadas</h2>
+<a href="{{ url_for('liquidacion_bp.crear_liquidacion') }}" class="btn btn-primary mb-3">Nueva Liquidación</a>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Empleado</th>
+            <th>Documento</th>
+            <th>Cargo</th>
+            <th>Tipo de Pago</th>
+            <th>Fecha de Pago</th>
+            <th>Salario</th>
+            <th>Aux. Transporte</th>
+            <th>Horas Extra</th>
+            <th>Prima</th>
+            <th>Total Devengado</th>
+            <th>Salud</th>
+            <th>Pensión</th>
+            <th>Total Deducciones</th>
+            <th><strong>Neto a Pagar</strong></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for l in liquidaciones %}
+        <tr>
+            <td>{{ l.id_liquidacion }}</td>
+            <td>{{ l.nombre }}</td>
+            <td>{{ l.n_documento }}</td>
+            <td>{{ l.cargo }}</td>
+            <td>{{ l.tipo_pago }}</td>
+            <td>{{ l.fecha_pago }}</td>
+            <td>${{ l.salario_base  }}</td>
+            <td>${{ l.auxilio_transporte }}</td>
+            <td>${{ l.horas_extra }}</td>
+            <td>${{ l.prima_servicios }}</td>
+            <td><strong>${{ l.total_devengado }}</strong></td>
+            <td>${{ l.salud }}</td>
+            <td>${{ l.pension }}</td>
+            <td>${{ l.total_deducciones }}</td>
+            <td><strong>${{ l.total_pago }}</strong></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
