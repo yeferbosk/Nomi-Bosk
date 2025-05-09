@@ -75,12 +75,24 @@ def obtener_liquidaciones():
         l.total_devengado, 
         l.total_deducciones,
         l.auxilio_transporte,           
-        l.total_pago           
+        l.total_pago,
+        -- Campos del pago empleador
+        ss.salud_empleador,
+        ss.pension_empleador,
+        cs.valor as cesantias,
+        cs.i_c,
+        l.prima_servicios_empleador,
+        v.valor as vacaciones,
+        l.sena,
+        ss.riesgos_laborales,
+        l.total_pago_empleador
     FROM Liquidacion l
     JOIN Empleado e ON l.id_empleado = e.id_empleado
     JOIN Contrato c ON c.id_empleado = e.id_empleado 
     LEFT JOIN Horas_Extra h ON h.id_empleado = e.id_empleado
     LEFT JOIN Seguridad_Social ss ON ss.id_empleado = e.id_empleado
+    LEFT JOIN Cesantias cs ON cs.id_empleado = e.id_empleado
+    LEFT JOIN Vacaciones v ON v.id_empleado = e.id_empleado
     ORDER BY l.fecha_pago DESC
     """)
     liquidaciones = cursor.fetchall()
