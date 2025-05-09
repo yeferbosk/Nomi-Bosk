@@ -6,58 +6,101 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/estilos_dashboard.css') }}" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        body {
-            min-height: 100vh;
-            display: flex;
-        }
-        .sidebar {
-            width: 250px;
-            background-color: #343a40;
-            color: white;
-        }
-        .sidebar a {
-            color: white;
-            text-decoration: none;
-            display: block;
-            padding: 12px 20px;
-        }
-        .sidebar a:hover {
-            background-color: #495057;
-        }
-        .content {
-            flex-grow: 1;
-            padding: 2rem;
-            background-color: #f8f9fa;
-        }
-    </style>
 </head>
 <body>
-
     <!-- Sidebar -->
     <div class="sidebar">
-        <h4 class="text-center py-3 border-bottom">Módulos</h4>
-        <a href="#" onclick="loadView('/api/liquidacion')">Liquidación de Nómina</a>
-        <a href="#" onclick="loadView('/api/liquidacion_definitiva')">Liquidación Definitiva</a>
-        <a href="#" onclick="loadView('/api/cesantias')">Cesantías</a>
-        <a href="#" onclick="loadView('/api/seguridad_social')">Seguridad Social</a>
-        <a href="#" onclick="loadView('/api/empleados/')">Empleados</a>
+        <div class="logo-container text-center py-3">
+            <img src="{{ url_for('static', filename='imagenes/logo.png') }}" alt="Logo Sistema de Nómina" class="logo-img">
+        </div>
+        <h4 class="text-center">Sistema de Nómina</h4>
+        <a href="#" onclick="loadView('/api/liquidacion')">
+            <i class="bi bi-cash-coin"></i>
+            <span>Liquidación de Nómina</span>
+        </a>
+        <a href="#" onclick="loadView('/api/liquidacion_definitiva')">
+            <i class="bi bi-file-earmark-check"></i>
+            <span>Liquidación Definitiva</span>
+        </a>
+        <a href="#" onclick="loadView('/api/cesantias')">
+            <i class="bi bi-bank"></i>
+            <span>Cesantías</span>
+        </a>
+        <a href="#" onclick="loadView('/api/seguridad_social')">
+            <i class="bi bi-shield-check"></i>
+            <span>Seguridad Social</span>
+        </a>
+        <a href="#" onclick="loadView('/inicio/gestion_empleados/')">
+            <i class="bi bi-people"></i>
+            <span>Empleados</span>
+        </a>
     </div>
 
     <!-- Contenido Principal -->
     <div class="content">
-
         <!-- DASHBOARD -->
         <div id="dashboard-content">
-            <h1 class="mb-4">Dashboard Principal</h1>
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3">Dashboard Principal</h1>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-outline-primary" onclick="toggleTheme()">
+                        <i class="bi bi-moon-stars"></i>
+                    </button>
+                    <button class="btn btn-outline-primary">
+                        <i class="bi bi-bell"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tarjetas de Resumen -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card stats-card">
+                        <i class="bi bi-currency-dollar display-4 mb-3"></i>
+                        <h4>Total Pagado</h4>
+                        <h2 class="display-4">6.454 €</h2>
+                        <p class="text-success"><i class="bi bi-arrow-up"></i> 12% vs mes anterior</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card stats-card">
+                        <i class="bi bi-check-circle display-4 mb-3"></i>
+                        <h4>Nóminas Pagadas</h4>
+                        <h2 class="display-4">2</h2>
+                        <p class="text-muted">Este mes</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card stats-card">
+                        <i class="bi bi-people display-4 mb-3"></i>
+                        <h4>Empleados Activos</h4>
+                        <h2 class="display-4">15</h2>
+                        <p class="text-muted">Total</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card stats-card">
+                        <i class="bi bi-calendar-check display-4 mb-3"></i>
+                        <h4>Próxima Nómina</h4>
+                        <h2 class="display-4">15</h2>
+                        <p class="text-muted">Días restantes</p>
+                    </div>
+                </div>
+            </div>
 
             <!-- Gráfica de Sueldos -->
             <div class="row mb-4">
                 <div class="col-12">
                     <div class="card">
-                        <div class="card-header">
-                            <h5 class="card-title">Distribución de Salarios por Empleado</h5>
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="card-title mb-0">Distribución de Salarios</h5>
+                            <div class="btn-group">
+                                <button class="btn btn-sm btn-outline-secondary active">Mensual</button>
+                                <button class="btn btn-sm btn-outline-secondary">Trimestral</button>
+                                <button class="btn btn-sm btn-outline-secondary">Anual</button>
+                            </div>
                         </div>
                         <div class="card-body">
                             <canvas id="graficaSueldos"></canvas>
@@ -66,70 +109,86 @@
                 </div>
             </div>
 
+            <!-- Acciones Rápidas -->
             <div class="row mb-4">
                 <div class="col-md-4">
-                    <button class="btn btn-info w-100">Buscador Avanzado</button>
+                    <button class="btn btn-info w-100 d-flex align-items-center justify-content-center gap-2">
+                        <i class="bi bi-search"></i>
+                        Buscador Avanzado
+                    </button>
                 </div>
                 <div class="col-md-4">
-                    <button class="btn btn-success w-100">Mostrar Todo</button>
+                    <button class="btn btn-success w-100 d-flex align-items-center justify-content-center gap-2">
+                        <i class="bi bi-list-ul"></i>
+                        Mostrar Todo
+                    </button>
                 </div>
                 <div class="col-md-4">
-                    <a href="#" class="btn btn-danger w-100">Nueva Nómina</a>
+                    <a href="#" class="btn btn-danger w-100 d-flex align-items-center justify-content-center gap-2">
+                        <i class="bi bi-plus-circle"></i>
+                        Nueva Nómina
+                    </a>
                 </div>
             </div>
 
-            <div class="row mb-4">
-                <div class="col-md-6">
-                    <div class="card">
-                        <div class="card-body text-center">
-                            <h4>Pagadas</h4>
-                            <h1 class="display-4">2</h1>
-                        </div>
+            <!-- Tabla de Nóminas -->
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">Últimas Nóminas</h5>
+                    <div class="input-group" style="width: 300px;">
+                        <input type="text" class="form-control" placeholder="Buscar nómina...">
+                        <button class="btn btn-outline-secondary">
+                            <i class="bi bi-search"></i>
+                        </button>
                     </div>
                 </div>
-                <div class="col-md-6">
-                    <div class="card">
-                        <div class="card-body text-center">
-                            <h5 class="text-muted">Total Devengado</h5>
-                            <h3 class="text-primary">6.454 €</h3>
-                        </div>
-                    </div>
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>ID Nómina</th>
+                                <th>Empleado</th>
+                                <th>Mes Nómina</th>
+                                <th>Estado</th>
+                                <th>Paga Extra</th>
+                                <th>Devengos</th>
+                                <th>Deducciones</th>
+                                <th>Líquido</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>3</td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar-circle bg-primary text-white me-2">FJ</div>
+                                        <strong>Francisco Juper</strong>
+                                    </div>
+                                </td>
+                                <td>01-2020</td>
+                                <td><span class="badge bg-warning">Pendiente</span></td>
+                                <td><i class="bi bi-x-circle text-danger"></i></td>
+                                <td>2.576,00 €</td>
+                                <td>456,00 €</td>
+                                <td><strong>2.120,00 €</strong></td>
+                                <td>
+                                    <div class="btn-group">
+                                        <button class="btn btn-sm btn-outline-primary" title="Ver detalles">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-warning" title="Editar">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger" title="Eliminar">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
-            </div>
-
-            <div class="table-responsive">
-                <table class="table table-bordered table-hover">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>ID Nómina</th>
-                            <th>Empleado</th>
-                            <th>Mes Nómina</th>
-                            <th>Pagada</th>
-                            <th>Paga Extra</th>
-                            <th>Devengos</th>
-                            <th>Deducciones</th>
-                            <th>Líquido a Percibir</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr class="table-info">
-                            <td>3</td>
-                            <td><strong>Francisco Juper</strong></td>
-                            <td>01-2020</td>
-                            <td>No</td>
-                            <td>No</td>
-                            <td>2.576,00 €</td>
-                            <td>456,00 €</td>
-                            <td>2.120,00 €</td>
-                            <td>
-                                <button class="btn btn-warning btn-sm"><i class="bi bi-pencil"></i></button>
-                                <button class="btn btn-danger btn-sm"><i class="bi bi-trash"></i></button>
-                            </td>
-                        </tr>
-                        <!-- Más filas si es necesario -->
-                    </tbody>
-                </table>
             </div>
         </div>
 
@@ -138,60 +197,66 @@
     </div>
 
     <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Datos para la gráfica
+        // Configuración de la gráfica
+        const ctx = document.getElementById('graficaSueldos').getContext('2d');
         const datos = {
             labels: JSON.parse('{{ datos_grafica|map(attribute="nombre")|list|tojson|safe }}'),
             datasets: [{
                 label: 'Salario Bruto',
                 data: JSON.parse('{{ datos_grafica|map(attribute="salario_bruto")|list|tojson|safe }}'),
-                backgroundColor: 'rgba(54, 162, 235, 0.5)',
-                borderColor: 'rgba(54, 162, 235, 1)',
-                borderWidth: 1
+                backgroundColor: 'rgba(52, 152, 219, 0.5)',
+                borderColor: 'rgba(52, 152, 219, 1)',
+                borderWidth: 2,
+                borderRadius: 5,
+                barThickness: 20
             }]
         };
 
-        // Configuración de la gráfica
         const config = {
             type: 'bar',
             data: datos,
             options: {
                 responsive: true,
                 plugins: {
-                    title: {
-                        display: true,
-                        text: 'Salarios por Empleado'
-                    },
                     legend: {
-                        display: true,
-                        position: 'top'
+                        display: false
                     },
                     tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        padding: 12,
+                        titleFont: {
+                            size: 14,
+                            weight: 'bold'
+                        },
+                        bodyFont: {
+                            size: 13
+                        },
                         callbacks: {
                             label: function(context) {
-                                const dato = context.raw;
-                                const empleado = datos_grafica[context.dataIndex];
-                                return `ID: ${empleado.id_empleado} - Salario: $${dato.toLocaleString()}`;
+                                return `Salario: ${context.raw.toLocaleString('es-ES', {
+                                    style: 'currency',
+                                    currency: 'EUR'
+                                })}`;
                             }
                         }
                     }
                 },
                 scales: {
                     x: {
-                        title: {
-                            display: true,
-                            text: 'Empleados'
+                        grid: {
+                            display: false
                         }
                     },
                     y: {
                         beginAtZero: true,
-                        title: {
-                            display: true,
-                            text: 'Salario Bruto'
-                        },
                         ticks: {
                             callback: function(value) {
-                                return '$' + value.toLocaleString();
+                                return value.toLocaleString('es-ES', {
+                                    style: 'currency',
+                                    currency: 'EUR'
+                                });
                             }
                         }
                     }
@@ -199,10 +264,9 @@
             }
         };
 
-        // Crear la gráfica
-        const ctx = document.getElementById('graficaSueldos').getContext('2d');
         new Chart(ctx, config);
 
+        // Funciones de navegación
         function loadView(route) {
             fetch(route)
                 .then(response => response.text())
@@ -212,14 +276,20 @@
                     moduleContainer.style.display = "block";
                     moduleContainer.innerHTML = `
                         <div class="mb-3">
-                            <button class="btn btn-secondary" onclick="showDashboard()">← Volver al Dashboard</button>
+                            <button class="btn btn-secondary" onclick="showDashboard()">
+                                <i class="bi bi-arrow-left"></i> Volver al Dashboard
+                            </button>
                         </div>
                         ${data}
                     `;
                 })
                 .catch(error => {
                     console.error("Error cargando la vista:", error);
-                    document.getElementById("module-content").innerHTML = "<p>Error al cargar la vista.</p>";
+                    document.getElementById("module-content").innerHTML = `
+                        <div class="alert alert-danger">
+                            <i class="bi bi-exclamation-triangle"></i> Error al cargar la vista.
+                        </div>
+                    `;
                 });
         }
 
@@ -228,9 +298,26 @@
             document.getElementById("module-content").style.display = "none";
             document.getElementById("module-content").innerHTML = "";
         }
-    </script>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script>
+        // Función para alternar tema claro/oscuro
+        function toggleTheme() {
+            document.body.classList.toggle('dark-theme');
+        }
+
+        // Animaciones al cargar
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.card');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    card.style.transition = 'all 0.5s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+        });
+    </script>
 </body>
 </html>
 

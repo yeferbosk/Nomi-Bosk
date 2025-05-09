@@ -20,15 +20,15 @@ def create_app():
     def home():
         return render_template('dashboard.html')
 
-    # 👇 Importar blueprints dentro de la función create_app
-    from app.Routes import empleado_routes
-    from app.Routes import liquidacion_routes
+    # 👇 Importar los controladores dentro de la función create_app
+    from app.Controllers.empleado_controller import empleado_bp  # Importa el Blueprint directamente
+    from app.Controllers import liquidacion_controller  # Importa el controlador de liquidación
 
     # Registrar los blueprints con el prefijo de URL adecuado
     print("🧩 Registrando blueprint para empleados...")
-    app.register_blueprint(empleado_routes.empleado_bp, url_prefix='/api')
+    app.register_blueprint(empleado_bp)  # Ya tiene su propio url_prefix
     print("🧩 Registrando blueprint para liquidaciones...")
-    app.register_blueprint(liquidacion_routes.liquidacion_bp, url_prefix='/api')
+    app.register_blueprint(liquidacion_controller.liquidacion_bp, url_prefix='/api')
 
     # Mostrar las rutas disponibles para verificar que todo esté registrado correctamente
     print("\n🔍 Rutas disponibles:")

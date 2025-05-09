@@ -1,13 +1,52 @@
+from flask import Blueprint, render_template, request, redirect, url_for
 from app import get_connection
-from decimal import Decimal
-from datetime import datetime, timedelta
-from dateutil.relativedelta import relativedelta
+from app.Controllers import empleado_controller
 
+# Inicialización del Blueprint
+liquidacion_bp = Blueprint('liquidacion_bp', __name__)
 
-def crear_liquidacion(data):
+# Ruta para ver la lista de liquidaciones
+@liquidacion_bp.route('/liquidacion')
+def lista_liquidaciones():
+    liquidaciones = obtener_liquidaciones()
+    return render_template('liquidacion/listado_liquidaciones.html', liquidaciones=liquidaciones)
+
+# Ruta para crear una liquidación
+@liquidacion_bp.route('/liquidacion/crear', methods=['GET', 'POST'])
+def crear_liquidacion():
+    if request.method == 'POST':
+        data = {
+            'id_empleado': request.form['id_empleado'],
+            'tipo_pago': request.form['tipo_pago'],
+            'fecha_pago': request.form['fecha_pago']
+        }
+        _crear_liquidacion_backend(data)
+        return redirect(url_for('liquidacion_bp.lista_liquidaciones'))
+    
+    # Obtener empleados para el formulario de creación de liquidación
+    empleados = empleado_controller.obtener_empleados()
+    return render_template('liquidacion/crear.html', empleados=empleados)
+
+# Ruta para crear liquidación masiva
+@liquidacion_bp.route('/crear_masiva', methods=['POST'])
+def crear_liquidacion_masiva():
+    tipo_pago = request.form['tipo_pago']
     conn = get_connection()
     cursor = conn.cursor()
-    # Ya no calculas la fecha en el backend
+    # Llamar al procedimiento para crear liquidaciones masivas
+    cursor.callproc('crear_liquidaciones_masivas', [tipo_pago])
+    conn.commit()
+    cursor.close()
+    conn.close()
+    return redirect(url_for('liquidacion_bp.lista_liquidaciones'))
+
+
+# Función para crear una liquidación (backend)
+def _crear_liquidacion_backend(data):
+    """Implementa la lógica para crear una liquidación individual en la base de datos."""
+    conn = get_connection()
+    cursor = conn.cursor()
+    # Llamamos al procedimiento almacenado para crear la liquidación
     cursor.callproc('crear_liquidacion_nomina', [
         data['id_empleado'],
         data['tipo_pago']
@@ -16,7 +55,7 @@ def crear_liquidacion(data):
     cursor.close()
     conn.close()
 
-
+# Función para obtener todas las liquidaciones
 def obtener_liquidaciones():
     conn = get_connection()
     cursor = conn.cursor(dictionary=True)
@@ -31,8 +70,8 @@ def obtener_liquidaciones():
         c.salario_bruto as salario_base,
         h.cantidad as horas_extra,
         l.prima_servicios,
-        ss.salud,
-        ss.pension,
+        ss.salud as salud,
+        ss.pension as pension,
         l.total_devengado, 
         l.total_deducciones,
         l.auxilio_transporte,           

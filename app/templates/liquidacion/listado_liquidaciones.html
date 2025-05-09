@@ -14,9 +14,15 @@
         <p class="lead mb-4">
             Calcula el salario mensual de los empleados incluyendo devengos, deducciones y aportes según la normativa laboral colombiana.
         </p>
-        <a href="{{ url_for('liquidacion_bp.crear_liquidacion') }}" class="btn btn-primary mb-3">Nueva Liquidación</a>
-
-        <!-- Tabla de Resumen -->
+        <form action="{{ url_for('liquidacion_bp.crear_liquidacion_masiva') }}" method="POST" class="d-flex mb-3">
+            <select name="tipo_pago" class="form-select me-2" required>
+                <option value="" disabled selected>Seleccione el período</option>
+                <option value="Mensual">Mensual</option>
+                <option value="Quincenal">Quincenal</option>
+            </select>
+            <button type="submit" class="btn btn-primary">Nueva Liquidación</button>
+        </form>
+           <!-- Tabla de Resumen -->
         <div class="resumen-container mb-4">
             <div class="row">
                 <div class="col-md-3">
@@ -72,7 +78,7 @@
                 <div class="d-flex align-items-center">
                     <h2 class="mb-0 me-3">Empleados</h2>
                     <div class="header-actions">
-                        <a href="{{ url_for('empleado_bp.crear') }}" class="btn btn-success btn-sm me-2" title="Agregar Empleado">
+                        <a href="{{ url_for('empleado_bp.pt_crear_empleado') }}" class="btn btn-success btn-sm me-2" title="Agregar Empleado">
                             <i class="bi bi-person-plus-fill"></i>
                         </a>
                         <button class="btn btn-info btn-sm" title="Filtrar Empleados" data-bs-toggle="modal" data-bs-target="#filterModal">
@@ -123,8 +129,8 @@
                             <strong>${{ l.total_deducciones }}</strong>
                             <div class="collapse" id="deducciones-{{ l.id_liquidacion }}">
                                 <div class="card card-body mt-2">
-                                    <p>{{ l.salud.nombre }}: ${{ l.salud.valor }}</p>
-                                    <p>{{ l.pension.nombre }}: ${{ l.pension.valor }}</p>
+                                    <p>Salud: {{ l.salud }}</p>
+                                    <p>Pension: {{ l.pension }}</p>
                                 </div>
                             </div>
                         </td>
