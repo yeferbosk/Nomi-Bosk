@@ -30,6 +30,16 @@ python3 -m venv venv
 source venv/bin/activate
 ```
 
+Activa el entorno virtual con el comando 
+
+venv\Scripts\Activate
+
+En caso de querer desactivar el entorno virtual lo puedes hacer con el comando
+
+deactivate
+
+(Ten encuenta que todas las dependencias se deebne instalar con el entorno virtual activo).
+
 3️⃣ Instalar las dependencias
 ------------------------------
 Primero asegúrate de tener un archivo llamado `requirements.txt` en el proyecto. Luego ejecuta:
@@ -53,16 +63,6 @@ python run.py
 ```
 
 ✅ ¡Listo! Si todo está correcto, tu aplicación Flask estará corriendo en `http://localhost:5000`.
-
-📦 Archivo de dependencias
----------------------------
-El archivo debe llamarse: `requirements.txt`  
-Puedes generarlo automáticamente con:
-
-```bash
-pip freeze > requirements.txt
-```
-
 🔚 Fin del README
 ------------------
 Gracias por usar este proyecto. ¡Que tengas una gran experiencia desarrollando! 🧑‍💻✨
