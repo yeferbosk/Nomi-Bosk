@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for
+from flask import Blueprint, render_template, request, redirect, url_for, jsonify
 from app import get_connection
 from app.Controllers import empleado_controller
 
@@ -99,3 +99,26 @@ def obtener_liquidaciones():
     cursor.close()
     conn.close()
     return liquidaciones
+@liquidacion_bp.route('/filtrar_empleados', methods=['POST'])
+def filtrar_empleados():
+    data = request.get_json()
+    print("Datos recibidos:", data) 
+
+    tipo = data.get('tipo_filtro')
+    valor = data.get('valor_filtro')
+    operador = data.get('operador_salario')
+
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.callproc('FiltrarEmpleados', [tipo, valor, operador])
+    resultado = []
+    for res in cursor.stored_results():
+        resultado = res.fetchall()
+    cursor.close()
+    conn.close()
+
+    print("Resultado filtrado:", resultado)
+
+    return jsonify(resultado)  # Devuelve los datos filtrados como JSON
+                                    
+

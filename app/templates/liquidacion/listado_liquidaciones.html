@@ -108,7 +108,8 @@
                         <a href="{{ url_for('empleado_bp.pt_crear_empleado') }}" class="btn btn-success btn-sm me-2" title="Agregar Empleado">
                             <i class="bi bi-person-plus-fill"></i>
                         </a>
-                        <button class="btn btn-info btn-sm" title="Filtrar Empleados" data-bs-toggle="modal" data-bs-target="#filterModal">
+                        <button class="btn btn-info btn-sm" title="
+                        rar Empleados" data-bs-toggle="modal" data-bs-target="#filterModal">
                             <i class="bi bi-funnel-fill"></i>
                         </button>
                     </div>
@@ -184,65 +185,156 @@
             </table>
         </div>
 
-        <!-- Modal de Filtros -->
-        <div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="filterModalLabel">Filtrar Empleados</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <!-- Modal de Filtros -->
+<div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="filterModalLabel">Filtrar Empleados</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body">
+                <form id="filterForm">
+                    <!-- Selección del tipo de filtro -->
+                    <div class="mb-3">
+                        <label for="filterType" class="form-label">¿Por qué desea filtrar?</label>
+                        <select class="form-select" id="filterType" onchange="mostrarCampoFiltro()">
+                            <option value="">Seleccione...</option>
+                            <option value="CARGO">Cargo</option>
+                            <option value="SALARIO">Salario</option>
+                            <option value="FECHA">Fecha de Contratación</option>
+                        </select>
                     </div>
-                    <div class="modal-body">
-                        <form id="filterForm">
-                            <div class="mb-3">
-                                <label for="filterCargo" class="form-label">Cargo</label>
-                                <input type="text" class="form-control" id="filterCargo">
-                            </div>
-                            <div class="mb-3">
-                                <label for="filterSalario" class="form-label">Salario Mínimo</label>
-                                <input type="number" class="form-control" id="filterSalario">
-                            </div>
-                            <div class="mb-3">
-                                <label for="filterFecha" class="form-label">Fecha de Contratación</label>
-                                <input type="date" class="form-control" id="filterFecha">
-                            </div>
-                        </form>
+
+                    <!-- Campo: Cargo -->
+                    <div class="mb-3 filtro-campo" id="campoCargo" style="display: none;">
+                        <label for="filterCargo" class="form-label">Cargo</label>
+                        <input type="text" class="form-control" id="filterCargo">
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                        <button type="button" class="btn btn-primary" onclick="aplicarFiltros()">Aplicar Filtros</button>
+
+                    <!-- Campo: Salario -->
+                    <div class="mb-3 filtro-campo" id="campoSalario" style="display: none;">
+                        <label for="salarioOperador" class="form-label">Operador (>, <, >=, <=)</label>
+                        <select class="form-select" id="salarioOperador">
+                            <option value=">">Mayor que</option>
+                            <option value="<">Menor que</option>
+                            <option value=">=">Mayor o igual</option>
+                            <option value="<=">Menor o igual</option>
+                        </select>
+
+                        <label for="filterSalario" class="form-label mt-2">Salario</label>
+                        <input type="number" class="form-control" id="filterSalario">
                     </div>
-                </div>
+
+                    <!-- Campo: Fecha -->
+                    <div class="mb-3 filtro-campo" id="campoFecha" style="display: none;">
+                        <label for="filterFecha" class="form-label">Fecha desde</label>
+                        <input type="date" class="form-control" id="filterFecha">
+                    </div>
+                </form>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" onclick="aplicarFiltros()">Aplicar Filtros</button>
             </div>
         </div>
     </div>
+</div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        document.querySelectorAll('.devengos-cell, .deducciones-cell, .empleador-cell').forEach(cell => {
-            cell.style.cursor = 'pointer';
-            cell.addEventListener('click', function() {
-                const icon = this.querySelector('.bi-chevron-down');
-                if (icon) {
-                    icon.classList.toggle('bi-chevron-down');
-                    icon.classList.toggle('bi-chevron-up');
-                }
-            });
-        });
+<!-- Código JavaScript -->
+<script>
+    function mostrarCampoFiltro() {
+        const tipo = document.getElementById('filterType').value;
 
-        function aplicarFiltros() {
-            const cargo = document.getElementById('filterCargo').value;
-            const salario = document.getElementById('filterSalario').value;
-            const fecha = document.getElementById('filterFecha').value;
+        // Ocultar todos los campos de filtro
+        document.getElementById('campoCargo').style.display = 'none';
+        document.getElementById('campoSalario').style.display = 'none';
+        document.getElementById('campoFecha').style.display = 'none';
 
-            // Aquí puedes implementar la lógica de filtrado
-            // Por ejemplo, hacer una petición AJAX al servidor
-            console.log('Aplicando filtros:', { cargo, salario, fecha });
-            
-            // Cerrar el modal
-            const modal = bootstrap.Modal.getInstance(document.getElementById('filterModal'));
-            modal.hide();
+        // Mostrar el campo correspondiente según el tipo de filtro
+        if (tipo === 'CARGO') {
+            document.getElementById('campoCargo').style.display = 'block';
+        } else if (tipo === 'SALARIO') {
+            document.getElementById('campoSalario').style.display = 'block';
+        } else if (tipo === 'FECHA') {
+            document.getElementById('campoFecha').style.display = 'block';
         }
-    </script>
+    }
+
+    function aplicarFiltros() {
+    const tipo = document.getElementById('filterType').value;
+    let valor = '';
+    let operador = null;
+
+    if (tipo === 'CARGO') {
+        valor = document.getElementById('filterCargo').value;
+    } else if (tipo === 'SALARIO') {
+        valor = document.getElementById('filterSalario').value;
+        operador = document.getElementById('salarioOperador').value;
+    } else if (tipo === 'FECHA') {
+        valor = document.getElementById('filterFecha').value;
+    }
+
+    // Validación básica
+    if (!tipo || !valor) {
+        alert('Por favor complete todos los campos requeridos.');
+        return;
+    }
+
+    fetch('/filtrar_empleados', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            tipo_filtro: tipo,
+            valor_filtro: valor,
+            operador_salario: operador
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Error en la solicitud');
+        }
+        return response.json();
+    })
+    .then(data => {
+        const tablaBody = document.querySelector('#tabla-empleados tbody');
+        tablaBody.innerHTML = '';  // Limpia la tabla antes de agregar las filas
+
+        if (data.length === 0) {
+            tablaBody.innerHTML = '<tr><td colspan="4">No se encontraron empleados que coincidan con los filtros.</td></tr>';
+        } else {
+            data.forEach(empleado => {
+                const fila = `
+                    <tr>
+                        <td>${empleado.nombre}</td>
+                        <td>${empleado.cargo}</td>
+                        <td>${empleado.salario_base}</td>
+                        <td>${empleado.fecha_pago}</td>
+                    </tr>
+                `;
+                tablaBody.innerHTML += fila;  // Agrega una nueva fila por cada empleado filtrado
+            });
+        }
+
+        // Opcional: cerrar el modal después de aplicar los filtros
+        const modal = bootstrap.Modal.getInstance(document.getElementById('filterModal'));
+        modal.hide();
+    })
+    .catch(error => {
+        console.error('Error al aplicar filtros:', error);
+        alert('Hubo un error al aplicar los filtros. Intenta nuevamente.');
+    });
+}
+
+</script>
+
+
+
+
+
 </body>
 </html>

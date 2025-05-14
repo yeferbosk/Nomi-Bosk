@@ -1,4 +1,3 @@
--- Base de datos, Base de datos 2
 CREATE DATABASE Nomina_ProyectoFinalBD;
 USE Nomina_ProyectoFinalBD;
 
@@ -16,8 +15,6 @@ CREATE TABLE Empleado (
     direccion TEXT,
     fecha_ingreso DATE NOT NULL
 );
-
-select * from Empleado;
 
 CREATE TABLE Seguridad_Social (
     id_seguridadSocial INT AUTO_INCREMENT PRIMARY KEY,
@@ -83,6 +80,9 @@ CREATE TABLE Liquidacion (
     tipo_pago VARCHAR(50),
     fecha_pago DATE NOT NULL,
     prima_servicios DECIMAL(10, 2),
+    auxilio_transporte DECIMAL(10, 2) DEFAULT 0,
+    total_devengado DECIMAL(10, 2) NOT NULL, 
+    total_deducciones DECIMAL(10, 2) NOT NULL,
     total_pago DECIMAL(10, 2) NOT NULL,
     id_empleado INT,
     FOREIGN KEY (id_empleado) REFERENCES Empleado(id_empleado) ON DELETE CASCADE
@@ -101,127 +101,30 @@ ALTER TABLE Incapacidad ADD COLUMN id_seguridad_social INT;
 ALTER TABLE Incapacidad ADD FOREIGN KEY (id_seguridad_social) REFERENCES Seguridad_Social(id_seguridadSocial);
 
 
-INSERT INTO Empleado (email, nombre, fecha_nacimiento, telefono, estado_civil, genero, n_documento, cargo, estado, direccion, fecha_ingreso)
-VALUES
-('juan.perez@example.com', 'Juan Pérez', '1985-02-15', '3001234567', 'Soltero', 'Masculino', '1234567890', 'Desarrollador', TRUE, 'Calle Ficticia 123, Ciudad', '2020-01-10'),
-('maria.garcia@example.com', 'María García', '1990-07-22', '3007654321', 'Casada', 'Femenino', '0987654321', 'Analista', TRUE, 'Avenida Real 456, Ciudad', '2018-05-15');
 
-INSERT INTO Seguridad_Social (salud, riesgos_laborales, caja_compensacion, pension, id_empleado)
-VALUES
-('EPS SaludPlus', 'ARL RiesgosPlus', 'Caja Compensación ABC', 'Fondo Pensión A', 1),
-('EPS Bienestar', 'ARL Bienestar', 'Caja Compensación XYZ', 'Fondo Pensión B', 2);
-
-INSERT INTO Cesantias (fecha_pago, valor, id_empleado)
-VALUES
-('2024-06-30', 1500.00, 1),
-('2024-06-30', 2000.00, 2);
-
-INSERT INTO Incapacidad (tipo, fecha_inicio, fecha_fin, dias_incapacidad, porcentaje_pago, id_empleado)
-VALUES
-('Enfermedad común', '2024-03-10', '2024-03-20', 10, 75.00, 1),
-('Accidente de trabajo', '2024-04-01', '2024-04-10', 9, 100.00, 2);
-
-INSERT INTO Contrato (salario_bruto, tipo, horario, fecha_inicio, fecha_fin, id_empleado, id_seguridad_social)
-VALUES
-(3000.00, 'Indefinido', '9am - 6pm', '2020-01-10', NULL, 1, 1),
-(3500.00, 'Temporal', '8am - 5pm', '2022-06-15', '2023-06-15', 2, 2);
-
-INSERT INTO Vacaciones (fecha_inicio, fecha_fin, dias_vacaciones, id_empleado)
-VALUES
-('2023-12-01', '2023-12-15', 15, 1),
-('2024-02-01', '2024-02-10', 10, 2);
-
-INSERT INTO Horas_Extra (fecha, tipo, cantidad, valor, id_empleado, id_contrato)
-VALUES
-('2024-03-15', 'Nocturna', 5, 150.00, 1, 1),
-('2024-04-02', 'Diurna', 4, 120.00, 2, 2);
-
-INSERT INTO Liquidacion (tipo_pago, fecha_pago, prima_servicios, total_pago, id_empleado)
-VALUES
-('Quincenal', '2024-06-15', 250.00, 3500.00, 1),
-('Mensual', '2024-04-30', 300.00, 4200.00, 2);
-
-SELECT * FROM `Empleado`;
-
-
-DELIMITER //
-
-SHOW PROCEDURE STATUS WHERE Db = 'Nomina_ProyectoFinalBD';
-
-CALL crear_empleado(
-  'Carlos López',
-  'carlos.lopez@example.com',
-  '1992-05-20',
-  '3011122333',
-  'Soltero',
-  'Masculino',
-  '1122334455',
-  'Contador',
-  1,
-  'Calle 45 #67-89',
-  '2024-04-01'
-);
-
-SELECT * FROM Empleado ORDER BY id_empleado DESC;
-
-
-USE Nomina_ProyectoFinalBD2;
-SHOW PROCEDURE STATUS WHERE Db = 'Nomina_ProyectoFinalBD2';
-
-DELIMITER //
-
-CREATE PROCEDURE obtener_empleados()
-BEGIN
-    SELECT * FROM Empleado;
-END;
-//
-
-DELIMITER ;
+ALTER TABLE liquidacion
+ADD COLUMN auxilio_transporte DECIMAL(10, 2) DEFAULT 0,
+ADD COLUMN total_devengado DECIMAL(10, 2) NOT NULL,
+ADD COLUMN total_deducciones DECIMAL(10, 2) NOT NULL;
 
 
 
-DELIMITER //
+ALTER TABLE liquidacion
+ADD COLUMN total_pago_empleador DECIMAL(10, 2) DEFAULT 0;
 
-CREATE PROCEDURE crear_liquidacion_nomina (
-    IN p_id_empleado INT,
-    IN p_tipo_pago VARCHAR(50),
-    IN p_fecha_pago DATE
-)
-BEGIN
-    DECLARE v_salario DECIMAL(10,2);
-    DECLARE v_prima DECIMAL(10,2) DEFAULT 0;
-    DECLARE v_horas_extra DECIMAL(10,2) DEFAULT 0;
-    DECLARE v_total DECIMAL(10,2);
+ALTER TABLE seguridad_social
+ADD COLUMN salud_empleador DECIMAL(10, 2) DEFAULT 0,
+ADD COLUMN pension_empleador DECIMAL(10, 2) DEFAULT 0;
 
-    -- Obtener salario
-SELECT
-    salario_bruto
-INTO v_salario FROM
-    Contrato
-WHERE
-    id_empleado = p_id_empleado
-ORDER BY fecha_inicio DESC
-LIMIT 1;
+ALTER TABLE cesantias
+ADD COLUMN i_c DECIMAL(10, 2) DEFAULT 0;
 
-    -- Calcular prima (por simplicidad: 8.33% del salario mensual)
-    SET v_prima = v_salario * 0.0833;
+ALTER TABLE liquidacion
+ADD COLUMN sena DECIMAL(10, 2) DEFAULT 0;
 
-    -- Sumar horas extra
-SELECT
-    IFNULL(SUM(valor), 0)
-INTO v_horas_extra FROM
-    Horas_Extra
-WHERE
-    id_empleado = p_id_empleado
-        AND MONTH(fecha) = MONTH(p_fecha_pago);
+ALTER TABLE liquidacion
+ADD COLUMN prima_servicios_empleador DECIMAL(10, 2) DEFAULT 0;
 
-    -- Total devengado
-    SET v_total = v_salario + v_prima + v_horas_extra;
+ALTER TABLE vacaciones
+ADD COLUMN valor DECIMAL(10, 2) DEFAULT 0;
 
-    -- Insertar liquidación
-    INSERT INTO Liquidacion (tipo_pago, fecha_pago, prima_servicios, total_pago, id_empleado)
-    VALUES (p_tipo_pago, p_fecha_pago, v_prima, v_total, p_id_empleado);
-END;
-//
-
-DELIMITER ;
