@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liquidación de Cesantías</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        .table td {
+            color: #000 !important;
+            background-color: #fff !important;
+        }
+        .table td strong {
+            color: #000 !important;
+            font-weight: bold !important;
+        }
+        .table-striped tbody tr:nth-of-type(odd) td {
+            background-color: #f8f9fa !important;
+        }
+        .table-striped tbody tr:nth-of-type(even) td {
+            background-color: #fff !important;
+        }
+    </style>
+</head>
+<body class="bg-light">
+<div class="container mt-4">
+    <h1 class="display-4 mb-2">Liquidación de Cesantías</h1>
+    <p class="lead mb-4">
+        Consulta y calcula las cesantías de tus empleados conforme a lo estipulado por la ley laboral colombiana.
+    </p>
+
+    <form action="{{ url_for('cesantias_bp.calcular_cesantias') }}" method="POST" class="d-flex mb-4">
+        <button type="submit" class="btn btn-primary">Calcular Cesantías</button>
+    </form>
+
+    {% if cesantias_list %}
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID Empleado</th>
+                    <th>Nombre</th>
+                    <th>Salario Base</th>
+                    <th>Días Trabajados</th>
+                    <th>Cesantías</th>
+                    <th>Intereses</th>
+                    <th>Fecha de Corte</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in cesantias_list %}
+                <tr>
+                    <td>{{ c.id_empleado }}</td>
+                    <td>{{ c.nombre }}</td>
+                    <td>${{ c.salario_bruto }}</td>
+                    <td>360</td>
+                    <td>{{ c.valor }}</td>
+                    <td>{{ c.i_c }}</td>
+                    <td>{{ c.fecha_pago }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+        <div class="alert alert-info text-center" role="alert">
+            No hay cálculos de cesantías disponibles. Presiona "Calcular Cesantías" para iniciar el proceso.
+        </div>
+    {% endif %}
+</div>
+
+
+</body>
+</html>

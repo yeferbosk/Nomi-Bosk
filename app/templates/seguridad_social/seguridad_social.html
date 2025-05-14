@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seguridad Social</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/estilos_liquidacion.css') }}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        .table td {
+            color: #000 !important;
+            background-color: #fff !important;
+        }
+        .table td strong {
+            color: #000 !important;
+            font-weight: bold !important;
+        }
+        .table-striped tbody tr:nth-of-type(odd) td {
+            background-color: #f8f9fa !important;
+        }
+        .table-striped tbody tr:nth-of-type(even) td {
+            background-color: #fff !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <h1 class="display-4 mb-2">Seguridad Social</h1>
+        <p class="lead mb-4">
+            Gestiona y calcula las aportes a seguridad social de tus empleados según la normativa laboral colombiana.
+        </p>
+
+        <!-- Botones de acción -->
+        <div class="row mb-4">
+            <div class="col">
+                <form action="{{ url_for('seguridad_social_bp.calcular_seguridad_social_masiva') }}" method="POST" class="d-inline">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-calculator"></i> Calcular Seguridad Social Masiva
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Resumen de Totales -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="resumen-card">
+                    <div class="resumen-icon">
+                        <i class="bi bi-people"></i>
+                    </div>
+                    <div class="resumen-info">
+                        <h3>{{ seguridad_social_list|length }}</h3>
+                        <p>Total Empleados</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="resumen-card">
+                    <div class="resumen-icon">
+                        <i class="bi bi-cash-stack"></i>
+                    </div>
+                    <div class="resumen-info">
+                        <h3>${{ "{:,.2f}".format(seguridad_social_list|map(attribute='salud')|sum|float) }}</h3>
+                        <p>Total Salud</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="resumen-card">
+                    <div class="resumen-icon">
+                        <i class="bi bi-cash-coin"></i>
+                    </div>
+                    <div class="resumen-info">
+                        <h3>${{ "{:,.2f}".format(seguridad_social_list|map(attribute='pension')|sum|float) }}</h3>
+                        <p>Total Pensión</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="resumen-card">
+                    <div class="resumen-icon">
+                        <i class="bi bi-building"></i>
+                    </div>
+                    <div class="resumen-info">
+                        <h3>${{ "{:,.2f}".format(seguridad_social_list|map(attribute='riesgos_laborales')|sum|float) }}</h3>
+                        <p>Total ARL</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabla de Seguridad Social -->
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped">
+                <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Salario Bruto</th>
+                        <th>Salud (Empleado)</th>
+                        <th>Salud (Empleador)</th>
+                        <th>Pensión (Empleado)</th>
+                        <th>Pensión (Empleador)</th>
+                        <th>Riesgos Laborales</th>
+                        <th>Caja de Compensación</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in seguridad_social_list %}
+                    <tr>
+                        <td>{{ item.id_empleado }}</td>
+                        <td>{{ item.nombre }}</td>
+                        <td>${{ "{:,.2f}".format(item.salario_bruto) }}</td>
+                        <td>${{ "{:,.2f}".format(item.salud) }}</td>
+                        <td>${{ "{:,.2f}".format(item.salud_empleador) }}</td>
+                        <td>${{ "{:,.2f}".format(item.pension) }}</td>
+                        <td>${{ "{:,.2f}".format(item.pension_empleador) }}</td>
+                        <td>${{ "{:,.2f}".format(item.riesgos_laborales) }}</td>
+                        <td>${{ "{:,.2f}".format(item.caja_compensacion) }}</td>
+                        <td>
+                            <form action="{{ url_for('seguridad_social_bp.calcular_seguridad_social') }}" method="POST" class="d-inline">
+                                <input type="hidden" name="id_empleado" value="{{ item.id_empleado }}">
+                                <button type="submit" class="btn btn-sm btn-info">
+                                    <i class="bi bi-calculator"></i> Calcular
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
