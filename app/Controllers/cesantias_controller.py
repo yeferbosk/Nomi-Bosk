@@ -23,20 +23,18 @@ def vista_cesantias():
 @cesantias_bp.route('/calcular_cesantias', methods=['POST'])
 def calcular_cesantias():
     conn = get_connection()
-    cursor = conn.cursor(dictionary=True)
-    cursor.execute("""
-    SELECT e.id_empleado, e.nombre, c.salario_bruto, ce.valor, ce.fecha_pago, ce.i_c
-    FROM Cesantias ce
-    JOIN Empleado e ON ce.id_empleado = e.id_empleado
-    JOIN Contrato c ON e.id_empleado = c.id_empleado
-    WHERE ce.fecha_pago = CURDATE()
-    """)
-    cesantias = cursor.fetchall()
-    cursor.close()
-    conn.close()
-
-    
-    return redirect(url_for('cesantias_bp.vista_cesantias'))
+    cursor = conn.cursor()
+    try:
+        # Llamar al procedimiento almacenado que calcula las cesantías
+        cursor.callproc('CalcularCesantias')
+        conn.commit()
+        return redirect(url_for('cesantias_bp.vista_cesantias'))
+    except Exception as e:
+        conn.rollback()
+        return jsonify({'error': str(e)}), 500
+    finally:
+        cursor.close()
+        conn.close()
     
     
     
