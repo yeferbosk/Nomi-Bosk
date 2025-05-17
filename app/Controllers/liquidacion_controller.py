@@ -23,9 +23,26 @@ def crear_liquidacion():
         _crear_liquidacion_backend(data)
         return redirect(url_for('liquidacion_bp.lista_liquidaciones'))
     
-    # Obtener empleados para el formulario de creación de liquidación
-    empleados = empleado_controller.obtener_empleados()
-    return render_template('liquidacion/crear.html', empleados=empleados)
+    return render_template('liquidacion/crear.html')
+
+@liquidacion_bp.route('/crear_individual', methods=['POST'])
+def crear_liquidacion_individual():
+    id_empleado = request.form['id_empleado']
+    tipo_pago = request.form['tipo_pago']
+    
+    conn = get_connection()
+    cursor = conn.cursor()
+    try:
+        # Llamar al procedimiento para crear liquidación individual
+        cursor.callproc('crear_liquidacion_nomina', [id_empleado, tipo_pago])
+        conn.commit()
+        return redirect(url_for('liquidacion_bp.lista_liquidaciones'))
+    except Exception as e:
+        conn.rollback()
+        return jsonify({'error': str(e)}), 500
+    finally:
+        cursor.close()
+        conn.close()
 
 # Ruta para crear liquidación masiva
 @liquidacion_bp.route('/crear_masiva', methods=['POST'])

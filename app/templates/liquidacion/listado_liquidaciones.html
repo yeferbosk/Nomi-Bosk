@@ -38,6 +38,43 @@
             </select>
             <button type="submit" class="btn btn-primary">Nueva Liquidación</button>
         </form>
+
+        <!-- Botón para liquidación individual -->
+        <button type="button" class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#liquidacionIndividualModal">
+            Liquidación Individual
+        </button>
+
+        <!-- Modal de Liquidación Individual -->
+        <div class="modal fade" id="liquidacionIndividualModal" tabindex="-1" aria-labelledby="liquidacionIndividualModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="liquidacionIndividualModalLabel">Liquidación Individual</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="liquidacionIndividualForm" action="{{ url_for('liquidacion_bp.crear_liquidacion_individual') }}" method="POST">
+                            <div class="mb-3">
+                                <label for="id_empleado" class="form-label">ID del Empleado</label>
+                                <input type="number" class="form-control" id="id_empleado" name="id_empleado" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="tipo_pago_individual" class="form-label">Tipo de Pago</label>
+                                <select class="form-select" id="tipo_pago_individual" name="tipo_pago" required>
+                                    <option value="" disabled selected>Seleccione el período</option>
+                                    <option value="Mensual">Mensual</option>
+                                    <option value="Quincenal">Quincenal</option>
+                                </select>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                                <button type="submit" class="btn btn-primary">Calcular Liquidación</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
            <!-- Tabla de Resumen -->
         <div class="resumen-container mb-4">
             <div class="row">
@@ -242,97 +279,6 @@
         </div>
     </div>
 </div>
-
-<!-- Código JavaScript -->
-<script>
-    function mostrarCampoFiltro() {
-        const tipo = document.getElementById('filterType').value;
-
-        // Ocultar todos los campos de filtro
-        document.getElementById('campoCargo').style.display = 'none';
-        document.getElementById('campoSalario').style.display = 'none';
-        document.getElementById('campoFecha').style.display = 'none';
-
-        // Mostrar el campo correspondiente según el tipo de filtro
-        if (tipo === 'CARGO') {
-            document.getElementById('campoCargo').style.display = 'block';
-        } else if (tipo === 'SALARIO') {
-            document.getElementById('campoSalario').style.display = 'block';
-        } else if (tipo === 'FECHA') {
-            document.getElementById('campoFecha').style.display = 'block';
-        }
-    }
-
-    function aplicarFiltros() {
-    const tipo = document.getElementById('filterType').value;
-    let valor = '';
-    let operador = null;
-
-    if (tipo === 'CARGO') {
-        valor = document.getElementById('filterCargo').value;
-    } else if (tipo === 'SALARIO') {
-        valor = document.getElementById('filterSalario').value;
-        operador = document.getElementById('salarioOperador').value;
-    } else if (tipo === 'FECHA') {
-        valor = document.getElementById('filterFecha').value;
-    }
-
-    // Validación básica
-    if (!tipo || !valor) {
-        alert('Por favor complete todos los campos requeridos.');
-        return;
-    }
-
-    fetch('/filtrar_empleados', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            tipo_filtro: tipo,
-            valor_filtro: valor,
-            operador_salario: operador
-        })
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Error en la solicitud');
-        }
-        return response.json();
-    })
-    .then(data => {
-        const tablaBody = document.querySelector('#tabla-empleados tbody');
-        tablaBody.innerHTML = '';  // Limpia la tabla antes de agregar las filas
-
-        if (data.length === 0) {
-            tablaBody.innerHTML = '<tr><td colspan="4">No se encontraron empleados que coincidan con los filtros.</td></tr>';
-        } else {
-            data.forEach(empleado => {
-                const fila = `
-                    <tr>
-                        <td>${empleado.nombre}</td>
-                        <td>${empleado.cargo}</td>
-                        <td>${empleado.salario_base}</td>
-                        <td>${empleado.fecha_pago}</td>
-                    </tr>
-                `;
-                tablaBody.innerHTML += fila;  // Agrega una nueva fila por cada empleado filtrado
-            });
-        }
-
-        // Opcional: cerrar el modal después de aplicar los filtros
-        const modal = bootstrap.Modal.getInstance(document.getElementById('filterModal'));
-        modal.hide();
-    })
-    .catch(error => {
-        console.error('Error al aplicar filtros:', error);
-        alert('Hubo un error al aplicar los filtros. Intenta nuevamente.');
-    });
-}
-
-</script>
-
-
 
 
 
