@@ -1,8 +1,21 @@
+import mysql.connector
 from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
-import mysql.connector
 
 db = SQLAlchemy()
+
+from app.Models.Bonos import Bonos
+from app.Models.Cesantias import Cesantias
+from app.Models.Contrato import Contrato
+# Import models
+from app.Models.Empleado import Empleado
+from app.Models.Horas_Extra import HorasExtra
+from app.Models.Incapacidad import Incapacidad
+from app.Models.Liquidacion import Liquidacion
+from app.Models.Seguridad__social import SeguridadSocial
+from app.Models.TiposBonos import TiposBonos
+from app.Models.Vacaciones import Vacaciones
+
 
 def create_app():
     # Crear la instancia de la aplicación Flask
@@ -10,7 +23,7 @@ def create_app():
 
     app.secret_key = '123'
     # Configuración de la base de datos
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:12345678@localhost/Nomina_ProyectoFinalBD'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:1234@localhost/Nomina'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
     # Inicializar la base de datos con la aplicación
@@ -22,10 +35,16 @@ def create_app():
         return render_template('dashboard.html')
 
     # 👇 Importar los controladores dentro de la función create_app
-    from app.Controllers.empleado_controller import empleado_bp  # Importa el Blueprint directamente
-    from app.Controllers import liquidacion_controller  # Importa el controlador de liquidación
-    from app.Controllers import cesantias_controller
-    from app.Controllers import seguridadSocial_controller
+    from app.Controllers import \
+        liquidacion_controller  # Importa el controlador de liquidación
+    from app.Controllers import (cesantias_controller,
+                                 liquidacion_vacaciones_controller,
+                                 seguridadSocial_controller)
+    from app.Controllers.dashboard_controller import dashboard_bp
+    from app.Controllers.deducciones_controller import deducciones_bp
+    from app.Controllers.empleado_controller import \
+        empleado_bp  # Importa el Blueprint directamente
+    from app.Controllers.vacaciones_controller import vacaciones_bp
 
     # Registrar los blueprints con el prefijo de URL adecuado
     print("🧩 Registrando blueprint para empleados...")
@@ -36,6 +55,14 @@ def create_app():
     app.register_blueprint(cesantias_controller.cesantias_bp, url_prefix='/api')
     print("🧩 Registrando blueprint para Seguridad Social...")
     app.register_blueprint(seguridadSocial_controller.seguridad_social_bp, url_prefix='/api')
+    print("🧩 Registrando blueprint para Liquidaciones de Vacaciones...")
+    app.register_blueprint(liquidacion_vacaciones_controller.liquidacion_vacaciones, url_prefix='/api')
+    print("🧩 Registrando blueprint para Vacaciones...")
+    app.register_blueprint(vacaciones_bp)
+    print("🧩 Registrando blueprint para Deducciones...")
+    app.register_blueprint(deducciones_bp)
+    print("🧩 Registrando blueprint para Dashboard...")
+    app.register_blueprint(dashboard_bp)
 
     # Mostrar las rutas disponibles para verificar que todo esté registrado correctamente
     print("\n🔍 Rutas disponibles:")
@@ -50,6 +77,6 @@ def get_connection():
     return mysql.connector.connect(
         host="localhost",
         user="root",
-        password="12345678",
-        database="Nomina_ProyectoFinalBD"
+        password="1234",
+        database="Nomina"
     )

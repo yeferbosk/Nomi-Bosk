@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Bonos y Comisiones</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container mt-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h2 class="mb-0">Bonos y Comisiones</h2>
+                <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#agregarBonoModal">
+                    <i class="bi bi-plus-circle"></i> Agregar Bono
+                </button>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre</th>
+                                <th>Cargo</th>
+                                <th>Email</th>
+                                <th>Salario Base</th>
+                                <th>Fecha Bono</th>
+                                <th>Valor Bono</th>
+
+                                <th>Observaciones</th>
+                                <th>Total Remuneración</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for b in bonos %}
+                            <tr>
+                                <td>{{ b.id_empleado }}</td>
+                                <td>{{ b.nombre }}</td>
+                                <td>{{ b.cargo }}</td>
+                                <td>{{ b.email }}</td>
+                                <td>${{ b.salario_base }}</td>
+                                <td>{{ b.fecha_bono }}</td>
+                                <td>${{ b.valor_bono }}</td>
+
+                                <td>{{ b.observaciones }}</td>
+                                <td>${{ b.total_remuneracion }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal para agregar bono -->
+    <div class="modal fade" id="agregarBonoModal" tabindex="-1" aria-labelledby="agregarBonoLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form action="{{ url_for('dashboard_bp.agregar_bono') }}" method="post">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="agregarBonoLabel">Agregar Bono</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="idEmpleado" class="form-label">Empleado</label>
+                            <select class="form-select" id="idEmpleado" name="id_empleado" required>
+                                <option value="">Seleccione un empleado</option>
+                                {% for e in empleados %}
+                                <option value="{{ e.id_empleado }}">{{ e.nombre }} - {{ e.cargo }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="valorBono" class="form-label">Valor Bono</label>
+                            <input type="number" class="form-control" id="valorBono" name="valor_bono" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="porcentajeCumplimiento" class="form-label">% Cumplimiento</label>
+                            <input type="number" class="form-control" id="porcentajeCumplimiento" name="porcentaje_cumplimiento" value="95" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="observaciones" class="form-label">Observaciones</label>
+                            <textarea class="form-control" id="observaciones" name="observaciones"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-success">Guardar Bono</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

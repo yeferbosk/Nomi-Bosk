@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard de Deducciones</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container mt-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h2 class="mb-0">Dashboard de Deducciones</h2>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped table-hover align-middle">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre</th>
+                                <th>Cargo</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for d in deducciones %}
+                            <tr style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#empleadoModal{{ d.id_empleado }}">
+                                <td>{{ d.id_empleado }}</td>
+                                <td>{{ d.nombre }}</td>
+                                <td>{{ d.cargo }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modales para cada empleado -->
+    {% for d in deducciones %}
+    <div class="modal fade" id="empleadoModal{{ d.id_empleado }}" tabindex="-1" aria-labelledby="empleadoModalLabel{{ d.id_empleado }}" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="empleadoModalLabel{{ d.id_empleado }}">Detalles de {{ d.nombre }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Información Básica</h6>
+                            <p><strong>ID:</strong> {{ d.id_empleado }}</p>
+                            <p><strong>Nombre:</strong> {{ d.nombre }}</p>
+                            <p><strong>Cargo:</strong> {{ d.cargo }}</p>
+                            <p><strong>Salario Bruto:</strong> ${{ "{:,.2f}".format(d.salario_bruto) }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Deducciones</h6>
+                            <p><strong>Deducción Salud:</strong> ${{ "{:,.2f}".format(d.deduccion_salud|float) }}</p>
+                            <p><strong>Deducción Pensión:</strong> ${{ "{:,.2f}".format(d.deduccion_pension|float) }}</p>
+                            <p><strong>Total Deducciones:</strong> ${{ "{:,.2f}".format(d.total_deducciones|float) }}</p>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <h6>Aportes Empleador</h6>
+                            <p><strong>Aporte Salud:</strong> ${{ "{:,.2f}".format(d.aporte_salud_empleador|float) }}</p>
+                            <p><strong>Aporte Pensión:</strong> ${{ "{:,.2f}".format(d.aporte_pension_empleador|float) }}</p>
+                            <p><strong>Aporte ARL:</strong> ${{ "{:,.2f}".format(d.aporte_arl|float) }}</p>
+                            <p><strong>Aporte CCF:</strong> ${{ "{:,.2f}".format(d.aporte_ccf|float) }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Prestaciones</h6>
+                            <p><strong>Prima Servicios:</strong> ${{ "{:,.2f}".format(d.prima_servicios|float) }}</p>
+                            <p><strong>Cesantías:</strong> ${{ "{:,.2f}".format(d.cesantias|float) }}</p>
+                            <p><strong>Intereses Cesantías:</strong> ${{ "{:,.2f}".format(d.intereses_cesantias|float) }}</p>
+                            <p><strong>Valor Vacaciones:</strong> ${{ "{:,.2f}".format(d.valor_vacaciones|float) }}</p>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <h6>Totales</h6>
+                            <p><strong>Total Devengado:</strong> ${{ "{:,.2f}".format(d.total_devengado|float) }}</p>
+                            <p><strong>Total Pago:</strong> ${{ "{:,.2f}".format(d.total_pago|float) }}</p>
+                            <p><strong>Total Pago Empleador:</strong> ${{ "{:,.2f}".format(d.total_pago_empleador|float) }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Otros</h6>
+                            <p><strong>Auxilio Transporte:</strong> ${{ "{:,.2f}".format(d.auxilio_transporte|float) }}</p>
+                            <p><strong>SENA:</strong> ${{ "{:,.2f}".format(d.sena|float) }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

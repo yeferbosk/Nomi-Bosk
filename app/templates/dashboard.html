@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <title>Dashboard | Sistema de Nómina</title>
@@ -9,6 +10,7 @@
     <link href="{{ url_for('static', filename='css/estilos_dashboard.css') }}" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
+
 <body>
     <!-- Sidebar -->
     <div class="sidebar">
@@ -48,9 +50,13 @@
                 <i class="bi bi-credit-card"></i>
                 <span>Pagos</span>
             </a>
-            <a href="#" onclick="loadView('/api/vacaciones')">
+            <a href="#" onclick="loadView('/api/liquidacion_vacaciones/vista')">
                 <i class="bi bi-umbrella"></i>
                 <span>Vacaciones</span>
+            </a>
+            <a href="#" onclick="loadView('/api/deducciones/vista')">
+                <i class="bi bi-cash-coin"></i>
+                <span>Deducciones</span>
             </a>
         </div>
     </div>
@@ -140,8 +146,7 @@
                 </div>
                 <div>
                     <a href="#" class="btn btn-danger d-inline-flex align-items-center gap-2 quick-action-btn">
-                        <i class="bi bi-plus-circle"></i>
-                        Nueva Nómina
+                        <i class="bi bi-plus-circle"></i> Nueva Nómina
                     </a>
                 </div>
             </div>
@@ -267,5 +272,5 @@
         });
     </script>
 </body>
-</html>
 
+</html>
