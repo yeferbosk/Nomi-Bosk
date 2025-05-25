@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard | Sistema de Nómina</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/estilos_dashboard.css') }}" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo-container text-center py-3">
+            <img src="{{ url_for('static', filename='imagenes/logo.png') }}" alt="Logo Sistema de Nómina" class="logo-img">
+        </div>
+        <h4 class="text-center">Sistema de Nómina</h4>
+        <a href="#" onclick="loadView('/api/liquidacion')">
+            <i class="bi bi-cash-coin"></i>
+            <span>Liquidación de Nómina</span>
+        </a>
+        <a href="#" onclick="loadView('/api/liquidacion_definitiva')">
+            <i class="bi bi-file-earmark-check"></i>
+            <span>Liquidación Definitiva</span>
+        </a>
+        <a href="#" onclick="loadView('/api/cesantias')">
+            <i class="bi bi-bank"></i>
+            <span>Cesantías</span>
+        </a>
+        <a href="#" onclick="loadView('/api/seguridad_social')">
+            <i class="bi bi-shield-check"></i>
+            <span>Seguridad Social</span>
+        </a>
+        <a href="#" onclick="loadView('/inicio/gestion_empleados/')">
+            <i class="bi bi-people"></i>
+            <span>Empleados</span>
+        </a>
+        <a href="#" onclick="loadView('/inicio/gestion_contratos/')">
+            <i class="bi bi-list-ul"></i>
+            <span>Contratos</span>
+        </a>
+    </div>
+    
+
+    <!-- Contenido Principal -->
+    <div class="content">
+        <!-- DASHBOARD -->
+        <div id="dashboard-content">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3">Dashboard Principal</h1>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-outline-primary" onclick="toggleTheme()">
+                        <i class="bi bi-moon-stars"></i>
+                    </button>
+                    <button class="btn btn-outline-primary">
+                        <i class="bi bi-bell"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tarjetas de Resumen -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card stats-card">
+                        <i class="bi bi-currency-dollar display-4 mb-3"></i>
+                        <h4>Total Pagado</h4>
+                        <h2 class="display-4">6.454 €</h2>
+                        <p class="text-success"><i class="bi bi-arrow-up"></i> 12% vs mes anterior</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card stats-card">
+                        <i class="bi bi-check-circle display-4 mb-3"></i>
+                        <h4>Nóminas Pagadas</h4>
+                        <h2 class="display-4">2</h2>
+                        <p class="text-muted">Este mes</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card stats-card">
+                        <i class="bi bi-people display-4 mb-3"></i>
+                        <h4>Empleados Activos</h4>
+                        <h2 class="display-4">15</h2>
+                        <p class="text-muted">Total</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card stats-card">
+                        <i class="bi bi-calendar-check display-4 mb-3"></i>
+                        <h4>Próxima Nómina</h4>
+                        <h2 class="display-4">15</h2>
+                        <p class="text-muted">Días restantes</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gráfica de Sueldos -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="card-title mb-0">Distribución de Salarios</h5>
+                            <div class="btn-group">
+                                <button class="btn btn-sm btn-outline-secondary active">Mensual</button>
+                                <button class="btn btn-sm btn-outline-secondary">Trimestral</button>
+                                <button class="btn btn-sm btn-outline-secondary">Anual</button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="graficaSueldos"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Acciones Rápidas -->
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <button class="btn btn-info w-100 d-flex align-items-center justify-content-center gap-2">
+                        <i class="bi bi-search"></i>
+                        Buscador Avanzado
+                    </button>
+                </div>
+                <div class="col-md-4">
+                    <button class="btn btn-success w-100 d-flex align-items-center justify-content-center gap-2">
+                        <i class="bi bi-list-ul"></i>
+                        Mostrar Todo
+                    </button>
+                </div>
+                <div class="col-md-4">
+                    <a href="#" class="btn btn-danger w-100 d-flex align-items-center justify-content-center gap-2">
+                        <i class="bi bi-plus-circle"></i>
+                        Nueva Nómina
+                    </a>
+                </div>
+            </div>
+
+            <!-- Tabla de Nóminas -->
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">Últimas Nóminas</h5>
+                    <div class="input-group" style="width: 300px;">
+                        <input type="text" class="form-control" placeholder="Buscar nómina...">
+                        <button class="btn btn-outline-secondary">
+                            <i class="bi bi-search"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>ID Nómina</th>
+                                <th>Empleado</th>
+                                <th>Mes Nómina</th>
+                                <th>Estado</th>
+                                <th>Paga Extra</th>
+                                <th>Devengos</th>
+                                <th>Deducciones</th>
+                                <th>Líquido</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>3</td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar-circle bg-primary text-white me-2">FJ</div>
+                                        <strong>Francisco Juper</strong>
+                                    </div>
+                                </td>
+                                <td>01-2020</td>
+                                <td><span class="badge bg-warning">Pendiente</span></td>
+                                <td><i class="bi bi-x-circle text-danger"></i></td>
+                                <td>2.576,00 €</td>
+                                <td>456,00 €</td>
+                                <td><strong>2.120,00 €</strong></td>
+                                <td>
+                                    <div class="btn-group">
+                                        <button class="btn btn-sm btn-outline-primary" title="Ver detalles">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-warning" title="Editar">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger" title="Eliminar">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- MÓDULOS DINÁMICOS -->
+        <div id="module-content" style="display: none;"></div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Configuración de la gráfica
+        const ctx = document.getElementById('graficaSueldos').getContext('2d');
+        const datos = {
+            labels: JSON.parse('{{ datos_grafica|map(attribute="nombre")|list|tojson|safe }}'),
+            datasets: [{
+                label: 'Salario Bruto',
+                data: JSON.parse('{{ datos_grafica|map(attribute="salario_bruto")|list|tojson|safe }}'),
+                backgroundColor: 'rgba(52, 152, 219, 0.5)',
+                borderColor: 'rgba(52, 152, 219, 1)',
+                borderWidth: 2,
+                borderRadius: 5,
+                barThickness: 20
+            }]
+        };
+
+        const config = {
+            type: 'bar',
+            data: datos,
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        padding: 12,
+                        titleFont: {
+                            size: 14,
+                            weight: 'bold'
+                        },
+                        bodyFont: {
+                            size: 13
+                        },
+                        callbacks: {
+                            label: function(context) {
+                                return `Salario: ${context.raw.toLocaleString('es-ES', {
+                                    style: 'currency',
+                                    currency: 'EUR'
+                                })}`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return value.toLocaleString('es-ES', {
+                                    style: 'currency',
+                                    currency: 'EUR'
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+        };
+
+        new Chart(ctx, config);
+
+        // Funciones de navegación
+        function loadView(route) {
+            fetch(route)
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById("dashboard-content").style.display = "none";
+                    const moduleContainer = document.getElementById("module-content");
+                    moduleContainer.style.display = "block";
+                    moduleContainer.innerHTML = `
+                        <div class="mb-3">
+                            <button class="btn btn-secondary" onclick="showDashboard()">
+                                <i class="bi bi-arrow-left"></i> Volver al Dashboard
+                            </button>
+                        </div>
+                        ${data}
+                    `;
+                })
+                .catch(error => {
+                    console.error("Error cargando la vista:", error);
+                    document.getElementById("module-content").innerHTML = `
+                        <div class="alert alert-danger">
+                            <i class="bi bi-exclamation-triangle"></i> Error al cargar la vista.
+                        </div>
+                    `;
+                });
+        }
+
+        function showDashboard() {
+            document.getElementById("dashboard-content").style.display = "block";
+            document.getElementById("module-content").style.display = "none";
+            document.getElementById("module-content").innerHTML = "";
+        }
+
+        // Función para alternar tema claro/oscuro
+        function toggleTheme() {
+            document.body.classList.toggle('dark-theme');
+        }
+
+        // Animaciones al cargar
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.card');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    card.style.transition = 'all 0.5s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+        });
+    </script>
+</body>
+</html>
+
