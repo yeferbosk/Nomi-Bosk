@@ -23,7 +23,7 @@ def create_app():
 
     app.secret_key = '123'
     # Configuración de la base de datos
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:1234@localhost/Nomina'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:12345678@localhost/Nomina_ProyectoFinalBD'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
     # Inicializar la base de datos con la aplicación
@@ -42,9 +42,9 @@ def create_app():
                                  seguridadSocial_controller)
     from app.Controllers.dashboard_controller import dashboard_bp
     from app.Controllers.deducciones_controller import deducciones_bp
-    from app.Controllers.empleado_controller import \
-        empleado_bp  # Importa el Blueprint directamente
+    from app.Controllers.empleado_controller import empleado_bp  # Importa el Blueprint directamente
     from app.Controllers.vacaciones_controller import vacaciones_bp
+    from app.Controllers.contrato_controller import contrato_bp  # Importa el controlador de contrato
 
     # Registrar los blueprints con el prefijo de URL adecuado
     print("🧩 Registrando blueprint para empleados...")
@@ -63,6 +63,8 @@ def create_app():
     app.register_blueprint(deducciones_bp)
     print("🧩 Registrando blueprint para Dashboard...")
     app.register_blueprint(dashboard_bp)
+    print("🧩 Registrando blueprint para Contratos...")
+    app.register_blueprint(contrato_bp)  # Ya tiene su propio url_prefix
 
     # Mostrar las rutas disponibles para verificar que todo esté registrado correctamente
     print("\n🔍 Rutas disponibles:")
@@ -77,6 +79,6 @@ def get_connection():
     return mysql.connector.connect(
         host="localhost",
         user="root",
-        password="1234",
-        database="Nomina"
+        password="12345678",
+        database="Nomina_ProyectoFinalBD"
     )

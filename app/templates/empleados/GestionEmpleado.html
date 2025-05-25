@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,7 +8,6 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/estilos_empleado.css') }}">
 </head>
-
 <body>
     <div class="container mt-4">
         <h1 class="display-4 mb-2">Gestión de Empleados</h1>
@@ -46,11 +44,6 @@
                         <button class="btn btn-info btn-sm" title="Filtrar Empleados" data-bs-toggle="modal" data-bs-target="#filterModal">
                             <i class="bi bi-funnel-fill"></i>
                         </button>
-                        <button type="button" class="btn btn-light border rounded shadow-sm p-2" data-bs-toggle="modal" data-bs-target="#editarEmpleadoModal">
-                        <i class="bi bi-calendar-event"></i>
-                    </button>
-
-
                     </div>
                 </div>
             </div>
@@ -88,8 +81,6 @@
                                 <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Está seguro de eliminar este empleado?')">
                                     <i class="bi bi-trash"></i>
                                 </button>
-
-
                             </form>
                         </td>
                     </tr>
@@ -131,105 +122,19 @@
         </div>
     </div>
 
-    <div class="modal fade" id="editarEmpleadoModal" tabindex="-1" aria-labelledby="editarEmpleadoLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <form action="/insertar-vacaciones" method="post" id="vacacionesForm">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="editarEmpleadoLabel">Asignar Vacaciones</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <label for="idEmpleado" class="form-label">Empleado</label>
-                            <select class="form-select" id="idEmpleado" name="id_empleado" required>
-                                <option value="">Seleccione un empleado</option>
-                                {% for e in empleados %}
-                                <option value="{{ e.id_empleado }}">{{ e.nombre }} - {{ e.cargo }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="fechaInicio" class="form-label">Fecha de Inicio</label>
-                            <input type="date" class="form-control" id="fechaInicio" name="fecha_inicio" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="fechaFin" class="form-label">Fecha de Fin</label>
-                            <input type="date" class="form-control" id="fechaFin" name="fecha_fin" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="diasVacaciones" class="form-label">Días de Vacaciones</label>
-                            <input type="number" class="form-control" id="diasVacaciones" name="dias_vacaciones" readonly>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-success">Guardar Vacaciones</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-
-
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         function aplicarFiltros() {
             const cargo = document.getElementById('filterCargo').value;
             const estado = document.getElementById('filterEstado').value;
-
+            
             // Aquí puedes implementar la lógica de filtrado
-            console.log('Aplicando filtros:', {
-                cargo,
-                estado
-            });
-
+            console.log('Aplicando filtros:', { cargo, estado });
+            
             // Cerrar el modal
             const modal = bootstrap.Modal.getInstance(document.getElementById('filterModal'));
             modal.hide();
         }
-
-        // Función para calcular días entre fechas
-        function calcularDiasEntreFechas(fechaInicio, fechaFin) {
-            const inicio = new Date(fechaInicio);
-            const fin = new Date(fechaFin);
-            const diffTime = Math.abs(fin - inicio);
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-            return diffDays + 1; // Incluir el día inicial
-        }
-
-        // Actualizar días de vacaciones cuando cambien las fechas
-        document.getElementById('fechaInicio').addEventListener('change', actualizarDiasVacaciones);
-        document.getElementById('fechaFin').addEventListener('change', actualizarDiasVacaciones);
-
-        function actualizarDiasVacaciones() {
-            const fechaInicio = document.getElementById('fechaInicio').value;
-            const fechaFin = document.getElementById('fechaFin').value;
-
-            if (fechaInicio && fechaFin) {
-                const dias = calcularDiasEntreFechas(fechaInicio, fechaFin);
-                document.getElementById('diasVacaciones').value = dias;
-            }
-        }
-
-        // Validación del formulario
-        document.getElementById('vacacionesForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-
-            const fechaInicio = new Date(document.getElementById('fechaInicio').value);
-            const fechaFin = new Date(document.getElementById('fechaFin').value);
-
-            if (fechaFin < fechaInicio) {
-                alert('La fecha de fin no puede ser anterior a la fecha de inicio');
-                return;
-            }
-
-            this.submit();
-        });
     </script>
-
 </body>
-
 </html>

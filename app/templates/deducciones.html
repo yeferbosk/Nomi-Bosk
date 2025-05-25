@@ -58,9 +58,10 @@
                         </div>
                         <div class="col-md-6">
                             <h6>Deducciones</h6>
-                            <p><strong>Deducción Salud:</strong> ${{ "{:,.2f}".format(d.deduccion_salud|float) }}</p>
-                            <p><strong>Deducción Pensión:</strong> ${{ "{:,.2f}".format(d.deduccion_pension|float) }}</p>
-                            <p><strong>Total Deducciones:</strong> ${{ "{:,.2f}".format(d.total_deducciones|float) }}</p>
+                            <p><strong>Deducción Salud:</strong> ${{ "{:,.2f}".format(d.deduccion_salud|default(0)|float) }}</p>
+                            <p><strong>Deducción Pensión:</strong> ${{ "{:,.2f}".format(d.deduccion_pension|default(0)|float) }}</p>
+                            <p><strong>Total Deducciones:</strong> ${{ "{:,.2f}".format(d.total_deducciones|default(0)|float) }}</p>
+
                         </div>
                     </div>
                     <div class="row mt-3">
