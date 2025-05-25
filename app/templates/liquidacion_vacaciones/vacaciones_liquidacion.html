@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liquidación de Vacaciones</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        .table th {
+            background-color: #343a40;
+            color: white;
+        }
+        
+        .summary-card {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .summary-card h3 {
+            color: #343a40;
+            margin-bottom: 15px;
+        }
+        
+        .summary-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #28a745;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container mt-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>Liquidación de Vacaciones</h1>
+
+        </div>
+
+        <!-- Resumen -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="summary-card">
+                    <h3>Total Empleados con Vacaciones</h3>
+                    <div class="summary-value">{{ vacaciones|length }}</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="summary-card">
+                    <h3>Total Pagos Vacacionales</h3>
+                    <div class="summary-value">${{ '{:,.2f}'.format(vacaciones|sum(attribute='pago_vacaciones')) }}</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="summary-card">
+                    <h3>Total Nómina Vacacional</h3>
+                    <div class="summary-value">${{ '{:,.2f}'.format(vacaciones|sum(attribute='nomina_total_mes_vacacional')) }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabla de Vacaciones -->
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th>ID Empleado</th>
+                        <th>Nombre</th>
+                        <th>Salario Base</th>
+                        <th>Fecha Inicio</th>
+                        <th>Fecha Fin</th>
+                        <th>Días Vacaciones</th>
+                        <th>Días Laborados</th>
+                        <th>Pago Vacaciones</th>
+                        <th>Nómina Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for vac in vacaciones %}
+                    <tr>
+                        <td>{{ vac.id_empleado }}</td>
+                        <td>{{ vac.nombre }}</td>
+                        <td>${{ '{:,.2f}'.format(vac.salario_base) }}</td>
+                        <td>{{ vac.fecha_inicio_vacaciones }}</td>
+                        <td>{{ vac.fecha_fin_vacaciones }}</td>
+                        <td>{{ vac.dias_vacaciones }}</td>
+                        <td>{{ vac.dias_laborados }}</td>
+                        <td>${{ '{:,.2f}'.format(vac.pago_vacaciones) }}</td>
+                        <td>${{ '{:,.2f}'.format(vac.nomina_total_mes_vacacional) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

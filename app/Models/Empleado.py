@@ -2,6 +2,7 @@
 
 from app import db
 
+
 class Empleado(db.Model):
     __tablename__ = 'Empleado'
     id_empleado = db.Column(db.Integer, primary_key=True)
@@ -16,3 +17,6 @@ class Empleado(db.Model):
     estado = db.Column(db.Boolean, default=True)
     direccion = db.Column(db.Text)
     fecha_ingreso = db.Column(db.Date, nullable=False)
+
+    # Relationships
+    bonos = db.relationship('Bonos', back_populates='empleado')
