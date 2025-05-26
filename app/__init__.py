@@ -1,6 +1,7 @@
 import mysql.connector
 from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
+from flask_cors import CORS
 
 db = SQLAlchemy()
 
@@ -9,7 +10,6 @@ from app.Models.Cesantias import Cesantias
 from app.Models.Contrato import Contrato
 # Import models
 from app.Models.Empleado import Empleado
-from app.Models.Horas_Extra import HorasExtra
 from app.Models.Incapacidad import Incapacidad
 from app.Models.Liquidacion import Liquidacion
 from app.Models.Seguridad__social import SeguridadSocial
@@ -20,6 +20,7 @@ from app.Models.Vacaciones import Vacaciones
 def create_app():
     # Crear la instancia de la aplicación Flask
     app = Flask(__name__)
+    CORS(app)
 
     app.secret_key = '123'
     # Configuración de la base de datos
@@ -45,8 +46,14 @@ def create_app():
     from app.Controllers.empleado_controller import empleado_bp  # Importa el Blueprint directamente
     from app.Controllers.vacaciones_controller import vacaciones_bp
     from app.Controllers.contrato_controller import contrato_bp  # Importa el controlador de contrato
+    from app.routes.horas_extra_routes import horas_extra_bp  # Importar el nuevo blueprint de horas extras
 
     # Registrar los blueprints con el prefijo de URL adecuado
+    print("\n=== Registrando Blueprints ===")
+    
+    print("🧩 Registrando blueprint para Horas Extras...")
+    app.register_blueprint(horas_extra_bp, url_prefix='/api/horas_extras')
+    
     print("🧩 Registrando blueprint para empleados...")
     app.register_blueprint(empleado_bp)  # Ya tiene su propio url_prefix
     print("🧩 Registrando blueprint para liquidaciones...")
