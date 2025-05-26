@@ -15,56 +15,78 @@
             Complete el formulario para registrar un nuevo empleado en el sistema.
         </p>
 
+        <!-- Mensajes de debug -->
+        <div id="debug-messages" class="alert alert-info" style="display: none;">
+            <pre id="debug-content"></pre>
+        </div>
+
+        <!-- Mensajes flash -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
         <div class="row justify-content-center">
             <div class="col-md-8">
-                <form action="{{ url_for('empleado_bp.pt_crear_empleado') }}" method="POST" class="card shadow-sm">
+                <form id="empleadoForm" action="{{ url_for('empleado_bp.pt_crear_empleado') }}" method="POST" class="card shadow-sm" novalidate>
                     <div class="card-body">
+                        <!-- Campos ocultos para debug -->
+                        <input type="hidden" name="debug_timestamp" value="{{ timestamp if timestamp }}">
+                        <input type="hidden" name="form_submitted" value="1">
+
                         <!-- Información Personal -->
                         <h4 class="mb-3">Información Personal</h4>
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="nombre" class="form-label">Nombre Completo *</label>
+                                <label for="nombre" class="form-label required">Nombre Completo</label>
                                 <input type="text" class="form-control" id="nombre" name="nombre" required>
+                                <div class="invalid-feedback">Por favor ingrese el nombre completo</div>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="n_documento" class="form-label">Número de Documento *</label>
+                                <label for="n_documento" class="form-label required">Número de Documento</label>
                                 <input type="text" class="form-control" id="n_documento" name="n_documento" required>
+                                <div class="invalid-feedback">Por favor ingrese el número de documento</div>
                             </div>
                         </div>
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="email" class="form-label">Correo Electrónico *</label>
+                                <label for="email" class="form-label required">Correo Electrónico</label>
                                 <input type="email" class="form-control" id="email" name="email" required>
-                                <div class="form-text">Este correo se usará para comunicaciones importantes.</div>
+                                <div class="invalid-feedback">Por favor ingrese un correo electrónico válido</div>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="telefono" class="form-label">Teléfono *</label>
+                                <label for="telefono" class="form-label required">Teléfono</label>
                                 <input type="tel" class="form-control" id="telefono" name="telefono" required
                                        pattern="[0-9]{10}" title="Ingrese un número de teléfono válido de 10 dígitos">
-                                <div class="form-text">Formato: 10 dígitos sin espacios ni guiones</div>
+                                <div class="invalid-feedback">Por favor ingrese un teléfono válido (10 dígitos)</div>
                             </div>
                         </div>
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="fecha_nacimiento" class="form-label">Fecha de Nacimiento *</label>
+                                <label for="fecha_nacimiento" class="form-label required">Fecha de Nacimiento</label>
                                 <input type="date" class="form-control" id="fecha_nacimiento" name="fecha_nacimiento" required>
+                                <div class="invalid-feedback">Por favor seleccione la fecha de nacimiento</div>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="genero" class="form-label">Género *</label>
+                                <label for="genero" class="form-label required">Género</label>
                                 <select class="form-select" id="genero" name="genero" required>
                                     <option value="">Seleccione...</option>
                                     <option value="M">Masculino</option>
                                     <option value="F">Femenino</option>
                                     <option value="O">Otro</option>
                                 </select>
+                                <div class="invalid-feedback">Por favor seleccione un género</div>
                             </div>
                         </div>
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="estado_civil" class="form-label">Estado Civil *</label>
+                                <label for="estado_civil" class="form-label required">Estado Civil</label>
                                 <select class="form-select" id="estado_civil" name="estado_civil" required>
                                     <option value="">Seleccione...</option>
                                     <option value="Soltero">Soltero(a)</option>
@@ -73,10 +95,12 @@
                                     <option value="Viudo">Viudo(a)</option>
                                     <option value="Union Libre">Unión Libre</option>
                                 </select>
+                                <div class="invalid-feedback">Por favor seleccione el estado civil</div>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="direccion" class="form-label">Dirección *</label>
+                                <label for="direccion" class="form-label required">Dirección</label>
                                 <input type="text" class="form-control" id="direccion" name="direccion" required>
+                                <div class="invalid-feedback">Por favor ingrese la dirección</div>
                             </div>
                         </div>
 
@@ -84,22 +108,19 @@
                         <h4 class="mt-4 mb-3">Información Laboral</h4>
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="cargo" class="form-label">Cargo *</label>
-                                <div class="input-group">
-                                    <select class="form-select" id="cargo" name="cargo" required>
-                                        <option value="">Seleccione un cargo...</option>
-                                        {% for cargo in cargos %}
-                                            <option value="{{ cargo }}">{{ cargo }}</option>
-                                        {% endfor %}
-                                    </select>
-                                    <button type="button" class="btn btn-outline-secondary" id="addCargoBtn" title="Agregar nuevo cargo">
-                                        <i class="bi bi-plus-lg"></i>
-                                    </button>
-                                </div>
+                                <label for="cargo" class="form-label required">Cargo</label>
+                                <select class="form-select" id="cargo" name="cargo" required>
+                                    <option value="">Seleccione un cargo...</option>
+                                    {% for cargo in cargos %}
+                                        <option value="{{ cargo }}">{{ cargo }}</option>
+                                    {% endfor %}
+                                </select>
+                                <div class="invalid-feedback">Por favor seleccione un cargo</div>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="fecha_inicio" class="form-label">Fecha de Ingreso *</label>
+                                <label for="fecha_inicio" class="form-label required">Fecha de Ingreso</label>
                                 <input type="date" class="form-control" id="fecha_inicio" name="fecha_inicio" required>
+                                <div class="invalid-feedback">Por favor seleccione la fecha de ingreso</div>
                             </div>
                         </div>
 
@@ -107,14 +128,15 @@
                         <h4 class="mt-4 mb-3">Información del Contrato</h4>
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="salario_bruto" class="form-label">Salario Bruto *</label>
+                                <label for="salario_bruto" class="form-label required">Salario Bruto</label>
                                 <div class="input-group">
                                     <span class="input-group-text">$</span>
-                                    <input type="number" class="form-control" id="salario_bruto" name="salario_bruto" required>
+                                    <input type="number" class="form-control" id="salario_bruto" name="salario_bruto" required min="1">
+                                    <div class="invalid-feedback">Por favor ingrese un salario válido</div>
                                 </div>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="tipo" class="form-label">Tipo de Contrato *</label>
+                                <label for="tipo" class="form-label required">Tipo de Contrato</label>
                                 <select class="form-select" id="tipo" name="tipo" required>
                                     <option value="">Seleccione...</option>
                                     <option value="Indefinido">Contrato Indefinido</option>
@@ -123,20 +145,22 @@
                                     <option value="Temporal">Contrato Temporal</option>
                                     <option value="Aprendizaje">Contrato de Aprendizaje</option>
                                 </select>
+                                <div class="invalid-feedback">Por favor seleccione el tipo de contrato</div>
                             </div>
                         </div>
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="horario" class="form-label">Horario Laboral *</label>
+                                <label for="horario" class="form-label required">Horario Laboral</label>
                                 <select class="form-select" id="horario" name="horario" required>
                                     <option value="">Seleccione...</option>
-                                    <option value="Diurno">Diurno (6:00 AM - 2:00 PM)</option>
-                                    <option value="Tarde">Tarde (2:00 PM - 10:00 PM)</option>
-                                    <option value="Nocturno">Nocturno (10:00 PM - 6:00 AM)</option>
+                                    <option value="8:00-17:00">Diurno (8:00 AM - 5:00 PM)</option>
+                                    <option value="14:00-22:00">Tarde (2:00 PM - 10:00 PM)</option>
+                                    <option value="22:00-6:00">Nocturno (10:00 PM - 6:00 AM)</option>
                                     <option value="Rotativo">Rotativo</option>
                                     <option value="Flexible">Horario Flexible</option>
                                 </select>
+                                <div class="invalid-feedback">Por favor seleccione el horario laboral</div>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="fecha_fin" class="form-label">Fecha de Finalización</label>
@@ -158,82 +182,94 @@
                             </button>
                         </div>
                     </div>
-
-                    <!-- Modal para agregar nuevo cargo -->
-                    <div class="modal fade" id="addCargoModal" tabindex="-1">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title">Agregar Nuevo Cargo</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                </div>
-                                <div class="modal-body">
-                                    <div class="mb-3">
-                                        <label for="newCargo" class="form-label">Nombre del Cargo *</label>
-                                        <input type="text" class="form-control" id="newCargo" required>
-                                    </div>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                    <button type="button" class="btn btn-primary" id="saveCargoBtn">Guardar</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <script>
-                        // Validaciones y funcionalidad JavaScript
-                        document.addEventListener('DOMContentLoaded', function() {
-                            // Validar fecha de finalización
-                            const fechaInicio = document.getElementById('fecha_inicio');
-                            const fechaFin = document.getElementById('fecha_fin');
-                            const tipoContrato = document.getElementById('tipo');
-
-                            function validarFechas() {
-                                if (fechaFin.value && fechaInicio.value && fechaFin.value < fechaInicio.value) {
-                                    fechaFin.setCustomValidity('La fecha de finalización debe ser posterior a la fecha de inicio');
-                                } else {
-                                    fechaFin.setCustomValidity('');
-                                }
-                            }
-
-                            fechaInicio.addEventListener('change', validarFechas);
-                            fechaFin.addEventListener('change', validarFechas);
-
-                            // Manejar tipo de contrato
-                            tipoContrato.addEventListener('change', function() {
-                                if (this.value === 'Indefinido') {
-                                    fechaFin.value = '';
-                                    fechaFin.disabled = true;
-                                } else {
-                                    fechaFin.disabled = false;
-                                }
-                            });
-
-                            // Agregar nuevo cargo
-                            document.getElementById('saveCargoBtn').addEventListener('click', function() {
-                                const newCargo = document.getElementById('newCargo').value.trim();
-                                if (newCargo) {
-                                    const cargoSelect = document.getElementById('cargo');
-                                    const option = new Option(newCargo, newCargo);
-                                    cargoSelect.add(option);
-                                    cargoSelect.value = newCargo;
-                                    bootstrap.Modal.getInstance(document.getElementById('addCargoModal')).hide();
-                                }
-                            });
-
-                            // Formatear salario
-                            const salarioInput = document.getElementById('salario_bruto');
-                            salarioInput.addEventListener('input', function() {
-                                this.setCustomValidity('');
-                            });
-                        });
-                    </script>
                 </form>
             </div>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('empleadoForm');
+            const debugDiv = document.getElementById('debug-messages');
+            const debugContent = document.getElementById('debug-content');
+            const fechaInicio = document.getElementById('fecha_inicio');
+            const fechaFin = document.getElementById('fecha_fin');
+            const tipoContrato = document.getElementById('tipo');
+
+            // Función para mostrar mensajes de debug
+            function showDebug(message) {
+                debugDiv.style.display = 'block';
+                debugContent.textContent += new Date().toISOString() + ': ' + message + '\n';
+            }
+
+            // Validar fechas
+            function validarFechas() {
+                if (fechaFin.value && fechaInicio.value && fechaFin.value < fechaInicio.value) {
+                    fechaFin.setCustomValidity('La fecha de finalización debe ser posterior a la fecha de inicio');
+                    return false;
+                } else {
+                    fechaFin.setCustomValidity('');
+                    return true;
+                }
+            }
+
+            // Manejar tipo de contrato
+            tipoContrato.addEventListener('change', function() {
+                if (this.value === 'Indefinido') {
+                    fechaFin.value = '';
+                    fechaFin.disabled = true;
+                } else {
+                    fechaFin.disabled = false;
+                }
+            });
+
+            // Validar formulario antes de enviar
+            form.addEventListener('submit', function(e) {
+                e.preventDefault(); // Prevenir envío por defecto
+                showDebug('Validando formulario...');
+
+                // Validar todos los campos requeridos
+                let isValid = true;
+                form.querySelectorAll('[required]').forEach(field => {
+                    if (!field.value.trim()) {
+                        field.classList.add('is-invalid');
+                        isValid = false;
+                        showDebug(`Campo requerido vacío: ${field.id}`);
+                    } else {
+                        field.classList.remove('is-invalid');
+                    }
+                });
+
+                // Validar fechas
+                if (!validarFechas()) {
+                    isValid = false;
+                    showDebug('Error en validación de fechas');
+                }
+
+                // Validar salario
+                const salario = document.getElementById('salario_bruto').value;
+                if (salario <= 0) {
+                    document.getElementById('salario_bruto').classList.add('is-invalid');
+                    isValid = false;
+                    showDebug('Salario inválido');
+                }
+
+                if (isValid) {
+                    showDebug('Formulario válido, enviando...');
+                    form.submit();
+                } else {
+                    showDebug('Formulario inválido, por favor corrija los errores');
+                }
+            });
+
+            // Limpiar validación al cambiar valor
+            form.querySelectorAll('input, select').forEach(field => {
+                field.addEventListener('change', function() {
+                    this.classList.remove('is-invalid');
+                });
+            });
+        });
+    </script>
 </body>
 </html>

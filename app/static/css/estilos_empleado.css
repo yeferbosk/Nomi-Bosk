@@ -1,0 +1,52 @@
+/* Estilos para el formulario de empleados */
+.form-control:focus {
+    border-color: #80bdff;
+    box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+}
+
+.btn-success {
+    background-color: #28a745;
+    border-color: #28a745;
+}
+
+.btn-success:hover {
+    background-color: #218838;
+    border-color: #1e7e34;
+}
+
+.alert {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+
+/* Estilos para mensajes de debug */
+#debug-messages {
+    font-family: monospace;
+    font-size: 0.9rem;
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 0.25rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+#debug-content {
+    margin: 0;
+    white-space: pre-wrap;
+}
+
+/* Estilos para campos requeridos */
+.form-label.required::after {
+    content: " *";
+    color: red;
+}
+
+/* Estilos para mensajes de error */
+.is-invalid {
+    border-color: #dc3545 !important;
+}
+
+.invalid-feedback {
+    display: block;
+    color: #dc3545;
+} 

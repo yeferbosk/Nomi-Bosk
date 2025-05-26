@@ -20,117 +20,160 @@ def pt_gestion_empleado():
 #End point crear empleado y contrato
 @empleado_bp.route('/crear_empleado', methods=['GET', 'POST'])
 def pt_crear_empleado():
-    conn = get_connection()
-    cursor = conn.cursor()
+    print("\n🔄 INICIANDO PROCESO DE CREAR EMPLEADO")
+    print("━━━━━━━━━━━━━━━━━━━━━━━━━━")
     
-    # Obtener cargos
-    cursor.callproc('obtener_cargos')
-    cargos = []
-    for result in cursor.stored_results():
-        cargos = [row[0] for row in result.fetchall() if row[0]]  # Solo agregar cargos no nulos
-    
-    print(f'Cargos disponibles = {cargos}')
-    
-    if not cargos:
-        print('No se encontraron cargos en la base de datos')
-        flash('No se encontraron cargos disponibles', 'warning')
-        cargos = ['Administrador', 'Desarrollador']  # Cargos por defecto
-    
-    cursor.close()
-    conn.close()
-
     if request.method == 'POST':
-        conn = get_connection()
-        cursor = conn.cursor()
+        print("📝 Método POST detectado - Procesando formulario")
+        print("\n📋 Datos recibidos en el request:")
+        print(f"Form data: {request.form}")
+        print(f"Content Type: {request.content_type}")
+        print(f"Headers: {request.headers}")
+        
         try:
-            # Datos del formulario empleado
-            nombre = request.form['nombre']
-            email = request.form['email']
-            fecha_nacimiento = request.form['fecha_nacimiento']
-            telefono = request.form['telefono']
-            estado_civil = request.form['estado_civil']
-            genero = request.form['genero']
-            n_documento = request.form['n_documento']
-            cargo = request.form['cargo']
-            estado = True
-            direccion = request.form['direccion']
-            fecha_ingreso = request.form['fecha_inicio']
+            print("\n1️⃣ Validando datos del formulario...")
+            required_fields = ['nombre', 'email', 'fecha_nacimiento', 'telefono', 
+                             'estado_civil', 'genero', 'n_documento', 'cargo',
+                             'direccion', 'fecha_inicio', 'salario_bruto', 
+                             'tipo', 'horario']
+            
+            missing_fields = [field for field in required_fields if not request.form.get(field)]
+            if missing_fields:
+                raise ValueError(f"Campos requeridos faltantes: {', '.join(missing_fields)}")
 
-            print(f'\nDatos del empleado a crear:')
-            print(f'Nombre: {nombre}')
-            print(f'Email: {email}')
-            print(f'Documento: {n_documento}')
-            print(f'Cargo: {cargo}')
-            print(f'Fecha ingreso: {fecha_ingreso}\n')
+            # Obtener y validar datos del formulario
+            nombre = request.form.get('nombre')
+            email = request.form.get('email')
+            fecha_nacimiento = request.form.get('fecha_nacimiento')
+            telefono = request.form.get('telefono')
+            estado_civil = request.form.get('estado_civil')
+            genero = request.form.get('genero')
+            n_documento = request.form.get('n_documento')
+            cargo = request.form.get('cargo')
+            estado = True
+            direccion = request.form.get('direccion')
+            fecha_ingreso = request.form.get('fecha_inicio')
+
+            print('\n🔵 DATOS DEL FORMULARIO VALIDADOS 🔵')
+            print('━━━━━━━━━━━━━━━━━━━━━━━━━━')
+            print(f'📝 Datos del empleado:')
+            print(f'   • Nombre: {nombre}')
+            print(f'   • Email: {email}')
+            print(f'   • Documento: {n_documento}')
+            print(f'   • Teléfono: {telefono}')
+            print(f'   • Cargo: {cargo}')
+            print(f'   • Fecha ingreso: {fecha_ingreso}')
+            print(f'   • Fecha nacimiento: {fecha_nacimiento}')
+            print(f'   • Género: {genero}')
+            print(f'   • Estado civil: {estado_civil}')
+            print(f'   • Dirección: {direccion}')
 
             # Datos del formulario contrato
-            salario_bruto = request.form['salario_bruto']
-            tipo = request.form['tipo']
-            horario = request.form['horario']
-            fecha_inicio = request.form['fecha_inicio']
-            fecha_fin = request.form['fecha_fin']
+            salario_bruto = request.form.get('salario_bruto')
+            tipo = request.form.get('tipo')
+            horario = request.form.get('horario')
+            fecha_inicio = request.form.get('fecha_inicio')
+            fecha_fin = request.form.get('fecha_fin')
 
-            print(f'Datos del contrato a crear:')
-            print(f'Salario: ${salario_bruto}')
-            print(f'Tipo: {tipo}')
-            print(f'Horario: {horario}')
-            print(f'Fecha inicio: {fecha_inicio}')
-            print(f'Fecha fin: {fecha_fin if fecha_fin else "Indefinido"}\n')
+            # Validar salario
+            try:
+                salario_bruto = float(salario_bruto)
+                if salario_bruto <= 0:
+                    raise ValueError("El salario debe ser mayor a 0")
+            except (TypeError, ValueError) as e:
+                raise ValueError(f"Salario inválido: {salario_bruto}. {str(e)}")
 
-            # Crear empleado
+            print(f'\n📄 Datos del contrato:')
+            print(f'   • Salario: ${salario_bruto}')
+            print(f'   • Tipo: {tipo}')
+            print(f'   • Horario: {horario}')
+            print(f'   • Fecha inicio: {fecha_inicio}')
+            print(f'   • Fecha fin: {fecha_fin if fecha_fin else "Indefinido"}')
+            print('━━━━━━━━━━━━━━━━━━━━━━━━━━')
+
+            print("\n2️⃣ Conectando a la base de datos...")
+            conn = get_connection()
+            cursor = conn.cursor()
+
+            print("3️⃣ Preparando argumentos para crear empleado...")
             args = (
                 nombre, email, fecha_nacimiento, telefono,
                 estado_civil, genero, n_documento, cargo,
                 estado, direccion, fecha_ingreso
             )
             
-            print('Intentando crear empleado...')
-            # Llamar al procedimiento y obtener el ID del empleado
+            print("4️⃣ Ejecutando procedimiento crear_empleado...")
+            print(f"Argumentos: {args}")
             cursor.callproc('crear_empleado', args)
-            conn.commit()
+            print("✅ Procedimiento ejecutado")
             
-            # Obtener el ID del último empleado insertado
+            print("5️⃣ Haciendo commit de la transacción...")
+            conn.commit()
+            print("✅ Commit realizado")
+            
+            print("6️⃣ Obteniendo ID del empleado creado...")
             cursor.execute("SELECT LAST_INSERT_ID()")
             result = cursor.fetchone()
             
             if result is not None:
                 id_empleado = result[0]
-                print(f'✅ Empleado creado exitosamente con ID: {id_empleado}')
+                print(f"✅ ID del empleado obtenido: {id_empleado}")
                 
-                print('Intentando crear contrato...')
-                # Crear contrato
+                print("7️⃣ Creando contrato...")
                 cursor.callproc("crear_contrato", (
                     salario_bruto, tipo, horario, fecha_inicio, fecha_fin, id_empleado
                 ))
                 conn.commit()
-                print('✅ Contrato creado exitosamente')
+                print("✅ Contrato creado exitosamente")
                 
                 mensaje = f'Empleado "{nombre}" y su contrato fueron creados exitosamente (ID: {id_empleado})'
-                print(mensaje)
+                print(f"🎉 {mensaje}")
                 flash(mensaje, 'success')
                 return redirect(url_for('empleado_bp.pt_gestion_empleado'))
             else:
                 conn.rollback()
-                mensaje = 'Error: No se pudo obtener el ID del empleado creado'
-                print(f'❌ {mensaje}')
+                mensaje = '❌ Error: No se pudo obtener el ID del empleado creado'
+                print(mensaje)
                 flash(mensaje, 'error')
             
+        except ValueError as ve:
+            print(f"\n❌ ERROR DE VALIDACIÓN:")
+            print(f"Descripción: {str(ve)}")
+            flash(f'Error de validación: {str(ve)}', 'error')
+            
         except Exception as e:
-            conn.rollback()
-            mensaje = f'Error al crear empleado o contrato: {str(e)}'
-            print(f'❌ {mensaje}')
+            print(f"\n❌ ERROR DETECTADO:")
+            print(f"Tipo de error: {type(e).__name__}")
+            print(f"Descripción: {str(e)}")
+            print("Detalles adicionales:", e.__dict__ if hasattr(e, '__dict__') else "No hay detalles adicionales")
             
-            # Intentar dar más detalles sobre el error
-            if 'Duplicate entry' in str(e):
-                if 'email' in str(e):
-                    mensaje = f'El email {email} ya está registrado'
-                elif 'n_documento' in str(e):
-                    mensaje = f'El documento {n_documento} ya está registrado'
-            
+            if 'conn' in locals():
+                conn.rollback()
+            mensaje = f'❌ Error al crear empleado o contrato: {str(e)}'
             flash(mensaje, 'error')
+            
         finally:
-            cursor.close()
-            conn.close()
+            if 'cursor' in locals():
+                print("\n🔄 Cerrando cursor...")
+                cursor.close()
+            if 'conn' in locals():
+                print("🔄 Cerrando conexión...")
+                conn.close()
+            print("✅ Recursos liberados")
+    else:
+        print("📋 Método GET detectado - Mostrando formulario")
+        
+    # Obtener cargos disponibles
+    print("\n🔄 Obteniendo lista de cargos...")
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.callproc('obtener_cargos')
+    cargos = []
+    for result in cursor.stored_results():
+        cargos = [row[0] for row in result.fetchall() if row[0]]
+    cursor.close()
+    conn.close()
+    print(f"📋 Cargos disponibles = {cargos}")
 
     return render_template('empleados/GestionEmpleadoAgregar.html', cargos=cargos)
 

@@ -9,8 +9,8 @@ def get_connection():
     return mysql.connector.connect(
         host="localhost",
         user="root",
-        password="12345678",
-        database="Nomina_ProyectoFinalBD"
+        password="1074129082",
+        database="nomina_proyectofinalbd2"
     )
 
 # Crear el blueprint
